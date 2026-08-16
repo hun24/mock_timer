@@ -14,6 +14,7 @@
             font-family: 'Pretendard', sans-serif;
             user-select: none;
         }
+        /* Custom Clock Hand Transitions */
         .clock-hand {
             transform-origin: bottom center;
         }
@@ -79,20 +80,25 @@
             </div>
         </section>
 
-        <!-- STEP 2: MAIN EXAM BROADCAST SCREEN -->
+        <!-- STEP 2: MAIN EXAM BROADCAST SCREEN (Initially Hidden) -->
         <section id="exam-screen" class="hidden w-full flex-col items-center space-y-8 my-auto">
+            
+            <!-- Current Status Header -->
             <div class="text-center space-y-2">
                 <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-sm font-semibold">
                     <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse"></span>
                     <span id="current-subject-badge">과목 준비 중</span>
                 </div>
                 <div id="digital-clock" class="text-4xl md:text-5xl font-extrabold text-white tracking-widest font-mono">00:00:00</div>
-                <div id="exam-status-text" class="text-slate-400 text-sm font-medium">현재 시각 기준 모의고사 진행 중</div>
+                <div id="exam-status-text" class="text-slate-400 text-sm font-medium">모의고사 진행 중</div>
             </div>
 
-            <!-- Analog Clock -->
+            <!-- Analog Clock Display -->
             <div class="relative w-64 h-64 md:w-80 md:h-80 bg-slate-800 rounded-full border-8 border-slate-700 shadow-2xl flex items-center justify-center p-4">
+                <!-- Clock Center Pin -->
                 <div class="absolute w-4 h-4 bg-indigo-500 rounded-full z-20 border-2 border-white shadow"></div>
+                
+                <!-- Hour Markers -->
                 <div class="absolute inset-0 p-3 flex flex-col justify-between text-center font-bold text-slate-500 text-sm">
                     <span>12</span>
                     <span>6</span>
@@ -101,13 +107,27 @@
                     <span>9</span>
                     <span>3</span>
                 </div>
-                <div id="hour-hand" class="absolute w-1.5 h-20 bg-slate-300 rounded-full clock-hand bottom-1/2 z-10"></div>
-                <div id="minute-hand" class="absolute w-1 h-28 bg-indigo-400 rounded-full clock-hand bottom-1/2 z-10"></div>
-                <div id="second-hand" class="absolute w-0.5 h-32 bg-rose-500 rounded-full clock-hand bottom-1/2 z-10"></div>
-            </div>
 
-            <!-- Controls -->
-            <div class="flex items-center justify-center gap-4 bg-slate-800/90 border border-slate-700 px-6 py-3 rounded-2xl shadow-xl">
+                <!-- Clock Hands -->
+            <div id="hour-hand" class="absolute w-1.5 h-20 bg-slate-300 rounded-full clock-hand bottom-1/2 z-10"></div>
+            <div id="minute-hand" class="absolute w-1 h-28 bg-indigo-400 rounded-full clock-hand bottom-1/2 z-10"></div>
+            <div id="second-hand" class="absolute w-0.5 h-32 bg-rose-500 rounded-full clock-hand bottom-1/2 z-10"></div>
+        </div>
+
+        <!-- Break Skip Banner (Appears after a subject ends during break time) -->
+        <div id="break-banner" class="hidden flex flex-col items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-6 py-3 rounded-2xl shadow-lg animate-fade-in">
+            <div class="text-amber-300 text-sm font-semibold flex items-center gap-2">
+                <i data-lucide="coffee" class="w-4 h-4"></i>
+                <span>전 과목 시험 종료 — 쉬는 시간 진행 중</span>
+            </div>
+            <button id="skip-break-btn" class="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white px-5 py-2 rounded-xl text-sm font-bold transition active:scale-95 shadow-lg shadow-amber-600/30">
+                <i data-lucide="fast-forward" class="w-4 h-4"></i>
+                <span>쉬는시간 건너뛰기</span>
+            </button>
+        </div>
+
+        <!-- Control Bar (Pause, -30s, +30s) -->
+        <div class="flex items-center justify-center gap-4 bg-slate-800/90 border border-slate-700 px-6 py-3 rounded-2xl shadow-xl">
                 <button id="rewind-30-btn" class="flex items-center gap-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold transition active:scale-95">
                     <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                     <span>30초 전</span>
@@ -125,91 +145,91 @@
             <!-- Timeline Indicators -->
             <div class="w-full max-w-3xl bg-slate-800/80 border border-slate-700/80 rounded-xl p-5 shadow-lg space-y-3">
                 <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-                    <span>방송 타임라인 스케줄 (항목 클릭 시 해당 알림 2초 전으로 이동)</span>
+                    <span>방송 타임라인</span>
                     <span id="next-bell-text" class="text-indigo-400 font-normal">다음 알림 대기 중</span>
                 </h4>
-                <div id="timeline-list" class="grid grid-cols-1 sm:grid-cols-5 gap-2"></div>
+                <div id="timeline-list" class="grid grid-cols-1 sm:grid-cols-5 gap-2">
+                    <!-- Populated dynamically -->
+                </div>
             </div>
         </section>
+
     </main>
 
     <!-- SETTINGS MODAL -->
     <div id="settings-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3">
                 <h3 class="text-lg font-bold text-white flex items-center gap-2">
                     <i data-lucide="sliders" class="text-indigo-400"></i>
-                    방송 신호음 및 웹서버 음원 설정
+                    방송 신호음 및 TTS 설정
                 </h3>
                 <button id="close-settings-btn" class="text-slate-400 hover:text-white p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
 
-            <!-- Sound Source Choice -->
+            <!-- Sound Type Selection -->
             <div class="space-y-4">
-                <h4 class="text-sm font-semibold text-indigo-300">종소리 음원 출처 선택</h4>
-                <div class="grid grid-cols-3 gap-3">
+                <h4 class="text-sm font-semibold text-indigo-300">종소리 오디오 유형 선택</h4>
+                <div class="grid grid-cols-2 gap-3">
                     <label class="flex items-center gap-2 p-3 bg-slate-700/50 rounded-lg border border-slate-600 cursor-pointer">
-                        <input type="radio" name="bell-sound-type" value="server" checked class="text-indigo-600">
-                        <span class="text-xs md:text-sm font-medium text-slate-200">웹서버 음원 (기본)</span>
+                        <input type="radio" name="bell-sound-type" value="melody" checked class="text-indigo-600">
+                        <span class="text-sm font-medium text-slate-200">학교 종소리 음악 (내장)</span>
                     </label>
                     <label class="flex items-center gap-2 p-3 bg-slate-700/50 rounded-lg border border-slate-600 cursor-pointer">
                         <input type="radio" name="bell-sound-type" value="custom" class="text-indigo-600">
-                        <span class="text-xs md:text-sm font-medium text-slate-200">로컬 MP3 업로드</span>
-                    </label>
-                    <label class="flex items-center gap-2 p-3 bg-slate-700/50 rounded-lg border border-slate-600 cursor-pointer">
-                        <input type="radio" name="bell-sound-type" value="synth" class="text-indigo-600">
-                        <span class="text-xs md:text-sm font-medium text-slate-200">내장 멜로디 (합성)</span>
+                        <span class="text-sm font-medium text-slate-200">사용자 MP3 파일 직접 지정</span>
                     </label>
                 </div>
             </div>
 
-            <!-- Server Bell URLs Configuration -->
-            <div class="space-y-3 pt-2 border-t border-slate-700">
-                <div class="flex justify-between items-center">
-                    <h4 class="text-sm font-semibold text-slate-300">웹서버 음원 경로 (상대경로 또는 전체 URL)</h4>
-                    <span class="text-xs text-slate-400">기본: ./audio/*.mp3</span>
-                </div>
+            <!-- Preset Melodies or Custom Bell MP3 Files -->
+            <div id="bell-files-section" class="space-y-3 pt-2">
+                <h4 class="text-sm font-semibold text-slate-300">단계별 종소리 음악 테스트 및 지정</h4>
                 
                 <div class="space-y-2 text-xs">
-                    <!-- 예비령 10분전 -->
-                    <div class="flex items-center gap-2 bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/60">
-                        <span class="font-bold text-slate-300 w-28 shrink-0">예비령 (10분전)</span>
-                        <input type="text" id="url-prep10" value="./audio/prep10.mp3" class="flex-1 bg-slate-800 border border-slate-600 rounded px-2.5 py-1 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500">
-                        <button onclick="playTestBell('prep10')" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1 rounded text-white font-medium flex items-center gap-1 shrink-0">
+                    <!-- 예비령 -->
+                    <div class="flex items-center justify-between bg-slate-900/60 p-3 rounded-lg border border-slate-700/60">
+                        <span class="font-bold text-slate-300 w-24">예비령 (10분전)</span>
+                        <input type="file" id="bell-file-prep10" accept="audio/*" class="hidden">
+                        <button onclick="document.getElementById('bell-file-prep10').click()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-slate-200">음원 파일 선택</button>
+                        <button onclick="playTestBell('prep10')" class="bg-indigo-600/80 hover:bg-indigo-500 px-3 py-1.5 rounded text-white font-medium flex items-center gap-1">
                             <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> 테스트
                         </button>
                     </div>
-                    <!-- 준비령 5분전 -->
-                    <div class="flex items-center gap-2 bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/60">
-                        <span class="font-bold text-slate-300 w-28 shrink-0">준비령 (5분전)</span>
-                        <input type="text" id="url-prep5" value="./audio/prep5.mp3" class="flex-1 bg-slate-800 border border-slate-600 rounded px-2.5 py-1 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500">
-                        <button onclick="playTestBell('prep5')" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1 rounded text-white font-medium flex items-center gap-1 shrink-0">
+                    <!-- 준비령 -->
+                    <div class="flex items-center justify-between bg-slate-900/60 p-3 rounded-lg border border-slate-700/60">
+                        <span class="font-bold text-slate-300 w-24">준비령 (5분전)</span>
+                        <input type="file" id="bell-file-prep5" accept="audio/*" class="hidden">
+                        <button onclick="document.getElementById('bell-file-prep5').click()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-slate-200">음원 파일 선택</button>
+                        <button onclick="playTestBell('prep5')" class="bg-indigo-600/80 hover:bg-indigo-500 px-3 py-1.5 rounded text-white font-medium flex items-center gap-1">
                             <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> 테스트
                         </button>
                     </div>
-                    <!-- 본령 시작 -->
-                    <div class="flex items-center gap-2 bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/60">
-                        <span class="font-bold text-slate-300 w-28 shrink-0">본령 (시작)</span>
-                        <input type="text" id="url-start" value="./audio/start.mp3" class="flex-1 bg-slate-800 border border-slate-600 rounded px-2.5 py-1 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500">
-                        <button onclick="playTestBell('start')" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1 rounded text-white font-medium flex items-center gap-1 shrink-0">
+                    <!-- 본령 -->
+                    <div class="flex items-center justify-between bg-slate-900/60 p-3 rounded-lg border border-slate-700/60">
+                        <span class="font-bold text-slate-300 w-24">본령 (시작)</span>
+                        <input type="file" id="bell-file-start" accept="audio/*" class="hidden">
+                        <button onclick="document.getElementById('bell-file-start').click()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-slate-200">음원 파일 선택</button>
+                        <button onclick="playTestBell('start')" class="bg-indigo-600/80 hover:bg-indigo-500 px-3 py-1.5 rounded text-white font-medium flex items-center gap-1">
                             <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> 테스트
                         </button>
                     </div>
                     <!-- 종료령 -->
-                    <div class="flex items-center gap-2 bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/60">
-                        <span class="font-bold text-slate-300 w-28 shrink-0">종료령 (종료)</span>
-                        <input type="text" id="url-end" value="./audio/end.mp3" class="flex-1 bg-slate-800 border border-slate-600 rounded px-2.5 py-1 text-slate-200 font-mono text-xs focus:outline-none focus:border-indigo-500">
-                        <button onclick="playTestBell('end')" class="bg-indigo-600 hover:bg-indigo-500 px-3 py-1 rounded text-white font-medium flex items-center gap-1 shrink-0">
+                    <div class="flex items-center justify-between bg-slate-900/60 p-3 rounded-lg border border-slate-700/60">
+                        <span class="font-bold text-slate-300 w-24">종료령 (종료)</span>
+                        <input type="file" id="bell-file-end" accept="audio/*" class="hidden">
+                        <button onclick="document.getElementById('bell-file-end').click()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-slate-200">음원 파일 선택</button>
+                        <button onclick="playTestBell('end')" class="bg-indigo-600/80 hover:bg-indigo-500 px-3 py-1.5 rounded text-white font-medium flex items-center gap-1">
                             <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> 테스트
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- TTS Setting -->
-            <div class="space-y-2 pt-2 border-t border-slate-700">
+            <!-- TTS Text Setting -->
+            <div class="space-y-2 pt-2">
                 <label class="text-sm font-semibold text-slate-300 block">종료 10분 전 TTS 안내 멘트 문구</label>
                 <textarea id="tts-text-input" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">시험 종료 10분 전입니다. 답안지 마킹을 확인해 주시기 바랍니다.</textarea>
                 <button onclick="testTTS()" class="text-xs text-indigo-400 hover:underline flex items-center gap-1">
@@ -230,6 +250,7 @@
 
     <!-- MAIN JAVASCRIPT APP LOGIC -->
     <script>
+        // --- 1. SUBJECT DEFINITIONS & DEFAULT TIMES ---
         const SUBJECT_PRESETS = [
             { id: 'korean', name: '국어', startTime: '08:40', duration: 80, hasListening: false },
             { id: 'math', name: '수학', startTime: '10:30', duration: 100, hasListening: false },
@@ -239,22 +260,30 @@
             { id: 'science', name: '과학탐구', startTime: '16:30', duration: 40, hasListening: false }
         ];
 
+        // State Management
         let selectedSubjects = ['korean', 'math', 'english', 'history', 'social', 'science'];
-        let subjectSchedules = [];
-        let audioFiles = {};
-        let customBellFiles = {};
+        let subjectSchedules = []; // Computed full schedules
+        let audioFiles = {}; // Listening MP3 files per subject
+        let customBellFiles = {}; // Custom Bell MP3 files
         let isRunning = false;
         let isPaused = false;
-        let currentVirtualTime = null;
+        let currentVirtualTime = null; // Simulated JS Date object
         let timerInterval = null;
         let activeAudio = null;
-        let triggeredEvents = new Set();
+        let triggeredEvents = new Set(); // To avoid duplicate triggers
 
-        let hourRotation = 0, minuteRotation = 0, secondRotation = 0;
-        let prevHourDeg = null, prevMinuteDeg = null, prevSecondDeg = null;
+        // Clock Rotation Rotations Tracking to prevent continuous reverse spinning
+        let hourRotation = 0;
+        let minuteRotation = 0;
+        let secondRotation = 0;
+        let prevHourDeg = null;
+        let prevMinuteDeg = null;
+        let prevSecondDeg = null;
 
+        // Web Audio API Synth Bell Generator
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+        // --- 2. INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             renderSubjectSelector();
@@ -262,6 +291,7 @@
             setupEventListeners();
         });
 
+        // --- 3. UI RENDERING & BUILDERS ---
         function renderSubjectSelector() {
             const container = document.getElementById('subject-selector');
             container.innerHTML = SUBJECT_PRESETS.map(sub => {
@@ -299,6 +329,8 @@
 
         function updateSelectedSubjectsUI() {
             const container = document.getElementById('selected-subjects-container');
+            
+            // Build schedule items
             subjectSchedules = selectedSubjects.map(id => {
                 const preset = SUBJECT_PRESETS.find(p => p.id === id);
                 return {
@@ -358,45 +390,45 @@
             }
         }
 
-        // Bell Sound Playing Logic with Fallback Hierarchy (Server Web URL -> Uploaded -> Synth)
+        // --- 4. BELL SOUND MELODY SYNTHESIS (School Bell Music) ---
         function playWestminsterBell() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            const notes = [{ f: 329.63, d: 0.6 }, { f: 415.30, d: 0.6 }, { f: 369.99, d: 0.6 }, { f: 246.94, d: 1.2 }];
+            
+            // Westminster Chime Frequencies (E4, G#4, F#4, B3)
+            const notes = [
+                { f: 329.63, d: 0.6 }, { f: 415.30, d: 0.6 }, { f: 369.99, d: 0.6 }, { f: 246.94, d: 1.2 }
+            ];
+            
             let now = audioCtx.currentTime;
             notes.forEach((note) => {
                 let osc = audioCtx.createOscillator();
                 let gain = audioCtx.createGain();
+                
                 osc.type = 'sine';
                 osc.frequency.value = note.f;
+                
                 gain.gain.setValueAtTime(0.3, now);
                 gain.gain.exponentialRampToValueAtTime(0.0001, now + note.d + 0.5);
+                
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
+                
                 osc.start(now);
                 osc.stop(now + note.d + 0.6);
+                
                 now += note.d;
             });
         }
 
         function playBellSound(type) {
-            const bellSoundType = document.querySelector('input[name="bell-sound-type"]:checked')?.value || 'server';
-
-            if (bellSoundType === 'server') {
-                const serverUrl = document.getElementById(`url-${type}`)?.value;
-                if (serverUrl) {
-                    const audio = new Audio(serverUrl);
-                    audio.play().catch(err => {
-                        console.warn(`[서버 음원 로드 실패] ${serverUrl}. 내장 멜로디로 대체됩니다.`, err);
-                        playWestminsterBell();
-                    });
-                } else {
-                    playWestminsterBell();
-                }
-            } else if (bellSoundType === 'custom' && customBellFiles[type]) {
+            const bellSoundType = document.querySelector('input[name="bell-sound-type"]:checked')?.value;
+            
+            if (bellSoundType === 'custom' && customBellFiles[type]) {
                 const url = URL.createObjectURL(customBellFiles[type]);
                 const audio = new Audio(url);
                 audio.play();
             } else {
+                // Default Synthesized Westminster Melody Music
                 playWestminsterBell();
             }
         }
@@ -420,6 +452,7 @@
             speakTTS(text);
         }
 
+        // --- 5. EXAM ENGINE & TIMELINE CALCULATION ---
         function calculateFullTimeline() {
             let events = [];
 
@@ -448,6 +481,7 @@
             const timeline = calculateFullTimeline();
             if (timeline.length === 0) return;
 
+            // Set Virtual Time to 1분 Before First Event
             currentVirtualTime = new Date(timeline[0].time.getTime() - 60000);
             
             document.getElementById('setup-screen').classList.add('hidden');
@@ -458,7 +492,10 @@
             isPaused = false;
             triggeredEvents.clear();
 
-            prevHourDeg = null; prevMinuteDeg = null; prevSecondDeg = null;
+            // Reset Clock Hand State
+            prevHourDeg = null;
+            prevMinuteDeg = null;
+            prevSecondDeg = null;
 
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(tick, 1000);
@@ -467,45 +504,62 @@
 
         function tick() {
             if (!isRunning || isPaused) return;
+
+            // Increment time by 1 second
             currentVirtualTime = new Date(currentVirtualTime.getTime() + 1000);
+
             updateClocks(currentVirtualTime);
             checkTimelineEvents(currentVirtualTime);
         }
 
+        // Clock Update with Continuous Cumulative Rotation Fix
         function updateClocks(date) {
             const hours = date.getHours();
             const minutes = date.getMinutes();
             const seconds = date.getSeconds();
 
-            document.getElementById('digital-clock').innerText = 
-                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            // Digital Clock
+            const hStr = String(hours).padStart(2, '0');
+            const mStr = String(minutes).padStart(2, '0');
+            const sStr = String(seconds).padStart(2, '0');
+            document.getElementById('digital-clock').innerText = `${hStr}:${mStr}:${sStr}`;
 
+            // Raw Angles (0-360 deg)
             let hourDeg = (hours % 12) * 30 + minutes * 0.5;
             let minuteDeg = minutes * 6 + seconds * 0.1;
             let secondDeg = seconds * 6;
 
+            // Continuous rotation logic for seconds hand
             if (prevSecondDeg !== null) {
                 let diff = secondDeg - (prevSecondDeg % 360);
                 if (diff < -180) diff += 360;
                 if (diff > 180) diff -= 360;
                 secondRotation += diff;
-            } else { secondRotation = secondDeg; }
+            } else {
+                secondRotation = secondDeg;
+            }
             prevSecondDeg = secondDeg;
 
+            // Continuous rotation logic for minutes hand
             if (prevMinuteDeg !== null) {
                 let diff = minuteDeg - (prevMinuteDeg % 360);
                 if (diff < -180) diff += 360;
                 if (diff > 180) diff -= 360;
                 minuteRotation += diff;
-            } else { minuteRotation = minuteDeg; }
+            } else {
+                minuteRotation = minuteDeg;
+            }
             prevMinuteDeg = minuteDeg;
 
+            // Continuous rotation logic for hours hand
             if (prevHourDeg !== null) {
                 let diff = hourDeg - (prevHourDeg % 360);
                 if (diff < -180) diff += 360;
                 if (diff > 180) diff -= 360;
                 hourRotation += diff;
-            } else { hourRotation = hourDeg; }
+            } else {
+                hourRotation = hourDeg;
+            }
             prevHourDeg = hourDeg;
 
             document.getElementById('hour-hand').style.transform = `rotate(${hourRotation}deg)`;
@@ -518,8 +572,10 @@
             const targetEvent = timeline.find(e => e.id === eventId);
             if (!targetEvent) return;
 
+            // Move Virtual Time to 2 seconds BEFORE event execution
             currentVirtualTime = new Date(targetEvent.time.getTime() - 2000);
             
+            // Clean future triggered events
             triggeredEvents.forEach(id => {
                 const ev = timeline.find(e => e.id === id);
                 if (ev && ev.time >= currentVirtualTime) {
@@ -541,12 +597,15 @@
 
             timeline.forEach(event => {
                 const diff = Math.abs(now.getTime() - event.time.getTime());
+                
+                // Trigger within 1-second window
                 if (diff < 1000 && !triggeredEvents.has(event.id)) {
                     triggeredEvents.add(event.id);
                     executeEventAction(event);
                 }
             });
 
+            // Highlight next upcoming bell
             const upcoming = timeline.find(e => e.time > now);
             if (upcoming) {
                 document.getElementById('next-bell-text').innerText = `다음 알림: [${upcoming.subject}] ${upcoming.type} (${formatTimeStr(upcoming.time)})`;
@@ -554,13 +613,96 @@
                 document.getElementById('next-bell-text').innerText = `모든 시험 방송 종료`;
             }
 
-            const activeSub = timeline.find(e => now >= e.time && e.action !== 'end');
-            if (activeSub) {
-                document.getElementById('current-subject-badge').innerText = `${activeSub.subject} 진행 중`;
+            // Update Active Subject / Break Status UI
+            updateStatusAndBreakUI(now);
+        }
+
+        function updateStatusAndBreakUI(now) {
+            let isBreak = false;
+            let activeSubjectName = null;
+
+            // Sort subject schedules by independent start time
+            const sortedSubs = [...subjectSchedules].map(sub => {
+                const [h, m] = sub.customStartTime.split(':').map(Number);
+                const start = new Date();
+                start.setHours(h, m, 0, 0);
+                const end = new Date(start.getTime() + sub.customDuration * 60000);
+                return { ...sub, startDate: start, endDate: end };
+            }).sort((a, b) => a.startDate - b.startDate);
+
+            for (let i = 0; i < sortedSubs.length; i++) {
+                const sub = sortedSubs[i];
+                // Check if currently taking an exam (from 10min prep till finish)
+                if (now >= new Date(sub.startDate.getTime() - 10 * 60000) && now < sub.endDate) {
+                    activeSubjectName = sub.name;
+                    break;
+                }
+                // Check if in break time following this exam
+                if (now >= sub.endDate) {
+                    const nextSub = sortedSubs[i + 1];
+                    if (nextSub && now < nextSub.startDate) {
+                        isBreak = true;
+                        break;
+                    }
+                }
+            }
+
+            const badge = document.getElementById('current-subject-badge');
+            const breakBanner = document.getElementById('break-banner');
+
+            if (isBreak) {
+                badge.innerText = '쉬는 시간';
+                if (breakBanner) breakBanner.classList.remove('hidden');
+            } else {
+                if (breakBanner) breakBanner.classList.add('hidden');
+                if (activeSubjectName) {
+                    badge.innerText = `${activeSubjectName} 진행 중`;
+                } else {
+                    badge.innerText = '과목 준비 대기 중';
+                }
             }
         }
 
+        function skipBreak() {
+            if (!currentVirtualTime) return;
+
+            // Find next subject scheduled after current time
+            const sortedSubs = [...subjectSchedules].map(sub => {
+                const [h, m] = sub.customStartTime.split(':').map(Number);
+                const start = new Date();
+                start.setHours(h, m, 0, 0);
+                return { ...sub, startDate: start };
+            }).sort((a, b) => a.startDate - b.startDate);
+
+            const nextSub = sortedSubs.find(sub => sub.startDate > currentVirtualTime);
+            if (!nextSub) return;
+
+            // Set virtual time to 10 minutes and 5 seconds before the next subject's start time
+            const targetTime = new Date(nextSub.startDate.getTime() - (10 * 60 + 5) * 1000);
+            currentVirtualTime = targetTime;
+
+            // Clear any future triggered events so they execute properly upon reaching them
+            const timeline = calculateFullTimeline();
+            triggeredEvents.forEach(id => {
+                const ev = timeline.find(e => e.id === id);
+                if (ev && ev.time >= currentVirtualTime) {
+                    triggeredEvents.delete(id);
+                }
+            });
+
+            if (activeAudio) {
+                activeAudio.pause();
+                activeAudio = null;
+            }
+
+            updateClocks(currentVirtualTime);
+            checkTimelineEvents(currentVirtualTime);
+            renderTimelineUI(timeline);
+        }
+
         function executeEventAction(event) {
+            console.log(`[EVENT TRIGGERED] ${event.subject} - ${event.type}`);
+
             if (event.action === 'prep10') {
                 playBellSound('prep10');
             } else if (event.action === 'prep5') {
@@ -568,6 +710,7 @@
             } else if (event.action === 'start') {
                 playBellSound('start');
                 if (event.hasListening && audioFiles[event.subId]) {
+                    // Play Listening Audio File
                     setTimeout(() => {
                         if (activeAudio) activeAudio.pause();
                         const url = URL.createObjectURL(audioFiles[event.subId]);
@@ -617,14 +760,30 @@
             return `${h}:${m}`;
         }
 
+        // --- 6. EVENT LISTENERS & CONTROLS ---
         function setupEventListeners() {
             document.getElementById('start-exam-btn').addEventListener('click', startExamSystem);
+            document.getElementById('skip-break-btn').addEventListener('click', skipBreak);
 
+            // Settings Modal Toggle
             const modal = document.getElementById('settings-modal');
             document.getElementById('open-settings-btn').addEventListener('click', () => modal.classList.remove('hidden'));
             document.getElementById('close-settings-btn').addEventListener('click', () => modal.classList.add('hidden'));
             document.getElementById('save-settings-btn').addEventListener('click', () => modal.classList.add('hidden'));
 
+            // File attachments for custom bells
+            ['prep10', 'prep5', 'start', 'end'].forEach(type => {
+                const el = document.getElementById(`bell-file-${type}`);
+                if (el) {
+                    el.addEventListener('change', (e) => {
+                        if (e.target.files && e.target.files[0]) {
+                            customBellFiles[type] = e.target.files[0];
+                        }
+                    });
+                }
+            });
+
+            // Pause / Resume Toggle
             document.getElementById('pause-toggle-btn').addEventListener('click', () => {
                 isPaused = !isPaused;
                 document.getElementById('pause-text').innerText = isPaused ? '재개' : '일시정지';
@@ -637,6 +796,7 @@
                 }
             });
 
+            // Fast Rewind (-30 Seconds)
             document.getElementById('rewind-30-btn').addEventListener('click', () => {
                 if (currentVirtualTime) {
                     currentVirtualTime = new Date(currentVirtualTime.getTime() - 30000);
@@ -645,6 +805,7 @@
                 }
             });
 
+            // Fast Forward (+30 Seconds)
             document.getElementById('forward-30-btn').addEventListener('click', () => {
                 if (currentVirtualTime) {
                     currentVirtualTime = new Date(currentVirtualTime.getTime() + 30000);
@@ -653,6 +814,7 @@
                 }
             });
 
+            // Exit System
             document.getElementById('exit-btn').addEventListener('click', () => {
                 if (confirm('모의고사 방송을 종료하고 초기 화면으로 돌아가시겠습니까?')) {
                     isRunning = false;
