@@ -350,7 +350,7 @@
                         <span class="w-6 h-6 rounded-full bg-indigo-600/30 text-indigo-300 font-bold text-xs flex items-center justify-center border border-indigo-500/30">${index + 1}</span>
                         <div>
                             <h4 class="font-bold text-white text-base">${sub.name}</h4>
-                            <p class="text-xs text-slate-400">${sub.hasListening ? '영어 듣기 평가 방송 포함' : '일반 모의고사'}</p>
+                            <p class="text-xs text-slate-400">${sub.hasListening ? '영어 듣기 평가 방송 포함 (본령 없음)' : '일반 모의고사'}</p>
                         </div>
                     </div>
 
@@ -519,7 +519,11 @@
 
                 events.push({ id: `${sub.id}-prep10`, subject: sub.name, type: '예비령', time: prep10, action: 'prep10' });
                 events.push({ id: `${sub.id}-prep5`, subject: sub.name, type: '준비령', time: prep5, action: 'prep5' });
-                events.push({ id: `${sub.id}-start`, subject: sub.name, type: '본령 (시작)', time: start, action: 'start' });
+
+                // 영어 과목 및 듣기평가 포함 과목은 실제 수능 규정에 맞춰 본령(시작 종소리)을 생성하지 않음
+                if (sub.id !== 'english' && !sub.hasListening) {
+                    events.push({ id: `${sub.id}-start`, subject: sub.name, type: '본령 (시작)', time: start, action: 'start' });
+                }
 
                 if (sub.hasListening) {
                     const lParts = (sub.customListeningTime || sub.customStartTime).split(':').map(Number);
