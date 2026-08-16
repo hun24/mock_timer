@@ -145,7 +145,7 @@
             <!-- Timeline Indicators -->
             <div class="w-full max-w-3xl bg-slate-800/80 border border-slate-700/80 rounded-xl p-5 shadow-lg space-y-3">
                 <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-                    <span>방송 타임라인 스케줄 (항목 클릭 시 해당 알림 2초 전으로 이동)</span>
+                    <span>방송 타임라인</span>
                     <span id="next-bell-text" class="text-indigo-400 font-normal">다음 알림 대기 중</span>
                 </h4>
                 <div id="timeline-list" class="grid grid-cols-1 sm:grid-cols-5 gap-2">
@@ -245,12 +245,12 @@
     <script>
         // --- 1. SUBJECT DEFINITIONS & DEFAULT TIMES ---
         const SUBJECT_PRESETS = [
-            { id: 'korean', name: '국어', startTime: '08:40:00', duration: 80, hasListening: false },
-            { id: 'math', name: '수학', startTime: '10:30:00', duration: 100, hasListening: false },
-            { id: 'english', name: '영어', startTime: '13:07:30', duration: 70, hasListening: true },
-            { id: 'history', name: '한국사', startTime: '14:50:00', duration: 30, hasListening: false },
-            { id: 'social', name: '사회탐구', startTime: '15:35:00', duration: 40, hasListening: false },
-            { id: 'science', name: '과학탐구', startTime: '16:30:00', duration: 40, hasListening: false }
+            { id: 'korean', name: '국어', startTime: '08:40', duration: 80, hasListening: false },
+            { id: 'math', name: '수학', startTime: '10:30', duration: 100, hasListening: false },
+            { id: 'english', name: '영어', startTime: '13:10', duration: 70, hasListening: true, listeningStartTime: '13:07:30' },
+            { id: 'history', name: '한국사', startTime: '14:50', duration: 30, hasListening: false },
+            { id: 'social', name: '사회탐구', startTime: '15:35', duration: 40, hasListening: false },
+            { id: 'science', name: '과학탐구', startTime: '16:30', duration: 40, hasListening: false }
         ];
 
         // State Management
@@ -339,6 +339,7 @@
                 return {
                     ...preset,
                     customStartTime: preset.startTime,
+                    customListeningTime: preset.listeningStartTime || preset.startTime,
                     customDuration: preset.duration
                 };
             });
@@ -355,9 +356,15 @@
 
                     <div class="flex flex-wrap items-center gap-3 w-full md:w-auto text-sm">
                         <div class="flex items-center gap-1.5">
-                            <span class="text-xs text-slate-400">시작/방송 시각:</span>
-                            <input type="time" step="1" value="${sub.customStartTime}" onchange="updateSubjectTime('${sub.id}', 'startTime', this.value)" class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500">
+                            <span class="text-xs text-slate-400">시험 시작 시각:</span>
+                            <input type="time" value="${sub.customStartTime}" onchange="updateSubjectTime('${sub.id}', 'startTime', this.value)" class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500">
                         </div>
+                        ${sub.hasListening ? `
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-xs text-indigo-300 font-semibold">듣기방송 시각:</span>
+                                <input type="time" step="1" value="${sub.customListeningTime}" onchange="updateSubjectTime('${sub.id}', 'listeningTime', this.value)" class="bg-slate-800 border border-indigo-500/60 rounded px-2 py-1 text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500">
+                            </div>
+                        ` : ''}
                         <div class="flex items-center gap-1.5">
                             <span class="text-xs text-slate-400">시험시간(분):</span>
                             <input type="number" value="${sub.customDuration}" onchange="updateSubjectTime('${sub.id}', 'duration', this.value)" class="w-16 bg-slate-800 border border-slate-600 rounded px-2 py-1 text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500">
@@ -383,6 +390,7 @@
             if (sub) {
                 if (key === 'duration') sub.customDuration = parseInt(val) || 0;
                 if (key === 'startTime') sub.customStartTime = val;
+                if (key === 'listeningTime') sub.customListeningTime = val;
             }
         }
 
@@ -511,7 +519,23 @@
 
                 events.push({ id: `${sub.id}-prep10`, subject: sub.name, type: '예비령', time: prep10, action: 'prep10' });
                 events.push({ id: `${sub.id}-prep5`, subject: sub.name, type: '준비령', time: prep5, action: 'prep5' });
-                events.push({ id: `${sub.id}-start`, subject: sub.name, type: '본령 (시작)', time: start, action: 'start', hasListening: sub.hasListening, subId: sub.id });
+                events.push({ id: `${sub.id}-start`, subject: sub.name, type: '본령 (시작)', time: start, action: 'start' });
+
+                if (sub.hasListening) {
+                    const lParts = (sub.customListeningTime || sub.customStartTime).split(':').map(Number);
+                    const listeningDate = new Date();
+                    listeningDate.setHours(lParts[0] || 0, lParts[1] || 0, lParts[2] || 0, 0);
+
+                    events.push({
+                        id: `${sub.id}-listening`,
+                        subject: sub.name,
+                        type: '듣기평가 방송',
+                        time: listeningDate,
+                        action: 'listening',
+                        subId: sub.id
+                    });
+                }
+
                 events.push({ id: `${sub.id}-remain10`, subject: sub.name, type: '10분전 TTS', time: remain10, action: 'remain10' });
                 events.push({ id: `${sub.id}-end`, subject: sub.name, type: '종료령', time: end, action: 'end' });
             });
@@ -751,14 +775,12 @@
                 playBellSound('prep5');
             } else if (event.action === 'start') {
                 playBellSound('start');
-                if (event.hasListening && audioFiles[event.subId]) {
-                    // Play Listening Audio File
-                    setTimeout(() => {
-                        if (activeAudio) activeAudio.pause();
-                        const url = URL.createObjectURL(audioFiles[event.subId]);
-                        activeAudio = new Audio(url);
-                        activeAudio.play();
-                    }, 3000);
+            } else if (event.action === 'listening') {
+                if (audioFiles[event.subId]) {
+                    if (activeAudio) activeAudio.pause();
+                    const url = URL.createObjectURL(audioFiles[event.subId]);
+                    activeAudio = new Audio(url);
+                    activeAudio.play();
                 }
             } else if (event.action === 'remain10') {
                 const text = document.getElementById('tts-text-input').value;
