@@ -55,7 +55,7 @@
                     <i data-lucide="check-square" class="text-indigo-400"></i>
                     응시 과목 및 시작 시간 설정
                 </h2>
-                <p class="text-slate-400 text-sm mt-1">응시할 과목을 선택하세요. 여러 과목을 동시에 선택하여 연속 시험을 치를 수 있습니다.</p>
+                <p class="text-slate-400 text-sm mt-1">응시할 과목을 선택하세요. 어떤 순서로 선택하든 국어 → 수학 → 영어 → 한국사 → 사회탐구 → 과학탐구 순으로 정렬 및 진행됩니다.</p>
             </div>
 
             <!-- Subject Selection Grid -->
@@ -65,7 +65,7 @@
 
             <!-- Selected Subjects List & Audio Upload Section -->
             <div class="space-y-4 pt-2">
-                <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider">선택된 시험 스케줄 목록</h3>
+                <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider">선택된 시험 스케줄 목록 (자동 표준 순서 정렬)</h3>
                 <div id="selected-subjects-container" class="space-y-3">
                     <!-- Populated dynamically -->
                 </div>
@@ -109,25 +109,13 @@
                 </div>
 
                 <!-- Clock Hands -->
-            <div id="hour-hand" class="absolute w-1.5 h-20 bg-slate-300 rounded-full clock-hand bottom-1/2 z-10"></div>
-            <div id="minute-hand" class="absolute w-1 h-28 bg-indigo-400 rounded-full clock-hand bottom-1/2 z-10"></div>
-            <div id="second-hand" class="absolute w-0.5 h-32 bg-rose-500 rounded-full clock-hand bottom-1/2 z-10"></div>
-        </div>
-
-        <!-- Break Skip Banner (Appears after a subject ends during break time) -->
-        <div id="break-banner" class="hidden flex flex-col items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-6 py-3 rounded-2xl shadow-lg animate-fade-in">
-            <div class="text-amber-300 text-sm font-semibold flex items-center gap-2">
-                <i data-lucide="coffee" class="w-4 h-4"></i>
-                <span>시험 종료 — 쉬는 시간 진행 중</span>
+                <div id="hour-hand" class="absolute w-1.5 h-20 bg-slate-300 rounded-full clock-hand bottom-1/2 z-10"></div>
+                <div id="minute-hand" class="absolute w-1 h-28 bg-indigo-400 rounded-full clock-hand bottom-1/2 z-10"></div>
+                <div id="second-hand" class="absolute w-0.5 h-32 bg-rose-500 rounded-full clock-hand bottom-1/2 z-10"></div>
             </div>
-            <button id="skip-break-btn" class="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white px-5 py-2 rounded-xl text-sm font-bold transition active:scale-95 shadow-lg shadow-amber-600/30">
-                <i data-lucide="fast-forward" class="w-4 h-4"></i>
-                <span>쉬는시간 건너뛰기</span>
-            </button>
-        </div>
 
-        <!-- Control Bar (Pause, -30s, +30s) -->
-        <div class="flex items-center justify-center gap-4 bg-slate-800/90 border border-slate-700 px-6 py-3 rounded-2xl shadow-xl">
+            <!-- Control Bar (Pause, -30s, +30s) -->
+            <div class="flex items-center justify-center gap-4 bg-slate-800/90 border border-slate-700 px-6 py-3 rounded-2xl shadow-xl">
                 <button id="rewind-30-btn" class="flex items-center gap-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2.5 rounded-xl text-sm font-bold transition active:scale-95">
                     <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                     <span>30초 전</span>
@@ -145,10 +133,10 @@
             <!-- Timeline Indicators -->
             <div class="w-full max-w-3xl bg-slate-800/80 border border-slate-700/80 rounded-xl p-5 shadow-lg space-y-3">
                 <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-                    <span>방송 타임라인</span>
+                    <span>방송 타임라인 스케줄</span>
                     <span id="next-bell-text" class="text-indigo-400 font-normal">다음 알림 대기 중</span>
                 </h4>
-                <div id="timeline-list" class="grid grid-cols-1 sm:grid-cols-5 gap-2">
+                <div id="timeline-list" class="grid grid-cols-1 sm:grid-cols-6 gap-2">
                     <!-- Populated dynamically -->
                 </div>
             </div>
@@ -171,55 +159,61 @@
 
             <!-- Sound Type Selection -->
             <div class="space-y-4">
-                <h4 class="text-sm font-semibold text-indigo-300">종소리 오디오 유형 선택</h4>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <label class="flex items-center gap-2 p-3 bg-slate-700/50 rounded-lg border border-slate-600 cursor-pointer hover:bg-slate-700">
-                        <input type="radio" name="bell-sound-type" value="melody" checked class="text-indigo-600" onchange="toggleBellSourceUI()">
-                        <span class="text-sm font-medium text-slate-200">학교 종소리 음악 (내장)</span>
+                <h4 class="text-sm font-semibold text-indigo-300">종소리 오디오 음원 방식</h4>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="flex items-center gap-2 p-3 bg-slate-700/50 rounded-lg border border-slate-600 cursor-pointer">
+                        <input type="radio" name="bell-sound-type" value="server" checked class="text-indigo-600">
+                        <span class="text-sm font-medium text-slate-200">웹 서버 음원 파일 (기본)</span>
                     </label>
-                    <label class="flex items-center gap-2 p-3 bg-slate-700/50 rounded-lg border border-slate-600 cursor-pointer hover:bg-slate-700">
-                        <input type="radio" name="bell-sound-type" value="server" class="text-indigo-600" onchange="toggleBellSourceUI()">
-                        <span class="text-sm font-medium text-slate-200">웹서버 음원 파일 (서버 경로)</span>
+                    <label class="flex items-center gap-2 p-3 bg-slate-700/50 rounded-lg border border-slate-600 cursor-pointer">
+                        <input type="radio" name="bell-sound-type" value="melody" class="text-indigo-600">
+                        <span class="text-sm font-medium text-slate-200">내장 오디오 합성 종소리</span>
                     </label>
-                    <label class="flex items-center gap-2 p-3 bg-slate-700/50 rounded-lg border border-slate-600 cursor-pointer hover:bg-slate-700">
-                        <input type="radio" name="bell-sound-type" value="custom" class="text-indigo-600" onchange="toggleBellSourceUI()">
-                        <span class="text-sm font-medium text-slate-200">사용자 MP3 직접 업로드</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Server Bell File Path Inputs -->
-            <div id="server-bell-section" class="hidden space-y-3 pt-2">
-                <div class="bg-indigo-950/40 border border-indigo-500/30 p-3.5 rounded-xl text-xs text-indigo-200">
-                    <p class="font-semibold flex items-center gap-1.5 text-sm text-indigo-300">
-                        <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i>
-                        웹서버 내장 음원 자동 연동
-                    </p>
-                    <p class="mt-1 text-slate-300">웹서버의 기본 상대 경로 음원 파일이 자동으로 지정되어 출력됩니다.</p>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs pt-1">
-                    <button onclick="playTestBell('prep10')" class="bg-slate-700/80 hover:bg-slate-600 p-2.5 rounded-lg text-slate-200 font-medium flex items-center justify-center gap-1.5 transition active:scale-95 border border-slate-600">
-                        <i data-lucide="volume-2" class="w-3.5 h-3.5 text-indigo-400"></i>
-                        <span>예비령 테스트</span>
-                    </button>
-                    <button onclick="playTestBell('prep5')" class="bg-slate-700/80 hover:bg-slate-600 p-2.5 rounded-lg text-slate-200 font-medium flex items-center justify-center gap-1.5 transition active:scale-95 border border-slate-600">
-                        <i data-lucide="volume-2" class="w-3.5 h-3.5 text-indigo-400"></i>
-                        <span>준비령 테스트</span>
-                    </button>
-                    <button onclick="playTestBell('start')" class="bg-slate-700/80 hover:bg-slate-600 p-2.5 rounded-lg text-slate-200 font-medium flex items-center justify-center gap-1.5 transition active:scale-95 border border-slate-600">
-                        <i data-lucide="volume-2" class="w-3.5 h-3.5 text-indigo-400"></i>
-                        <span>본령 테스트</span>
-                    </button>
-                    <button onclick="playTestBell('end')" class="bg-slate-700/80 hover:bg-slate-600 p-2.5 rounded-lg text-slate-200 font-medium flex items-center justify-center gap-1.5 transition active:scale-95 border border-slate-600">
-                        <i data-lucide="volume-2" class="w-3.5 h-3.5 text-indigo-400"></i>
-                        <span>종료령 테스트</span>
-                    </button>
                 </div>
             </div>
 
             <!-- Preset Melodies or Custom Bell MP3 Files -->
-            <div id="bell-files-section" class="hidden space-y-3 pt-2">
-                <h4 class="text-sm font-semibold text-slate-300">사용자 MP3 음원 파일 선택</h4>
+            <div id="bell-files-section" class="space-y-3 pt-2">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-sm font-semibold text-slate-300">단계별 웹 서버 음원 경로 및 테스트</h4>
+                    <button onclick="resetDefaultServerUrls()" class="text-xs text-indigo-400 hover:underline">기본 경로로 복원</button>
+                </div>
+                
+                <div class="space-y-2 text-xs">
+                    <!-- 예비령 -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-900/60 p-3 rounded-lg border border-slate-700/60 gap-2">
+                        <span class="font-bold text-slate-300 w-24">예비령 (10분전)</span>
+                        <input type="text" id="bell-url-prep10" class="flex-1 bg-slate-800 border border-slate-600 rounded px-2 py-1 text-slate-200 w-full font-mono text-xs focus:outline-none focus:border-indigo-500">
+                        <button onclick="playTestBell('prep10')" class="bg-indigo-600/80 hover:bg-indigo-500 px-3 py-1 rounded text-white font-medium flex items-center gap-1 self-end sm:self-auto">
+                            <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> 테스트
+                        </button>
+                    </div>
+                    <!-- 준비령 -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-900/60 p-3 rounded-lg border border-slate-700/60 gap-2">
+                        <span class="font-bold text-slate-300 w-24">준비령 (5분전)</span>
+                        <input type="text" id="bell-url-prep5" class="flex-1 bg-slate-800 border border-slate-600 rounded px-2 py-1 text-slate-200 w-full font-mono text-xs focus:outline-none focus:border-indigo-500">
+                        <button onclick="playTestBell('prep5')" class="bg-indigo-600/80 hover:bg-indigo-500 px-3 py-1 rounded text-white font-medium flex items-center gap-1 self-end sm:self-auto">
+                            <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> 테스트
+                        </button>
+                    </div>
+                    <!-- 본령 -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-900/60 p-3 rounded-lg border border-slate-700/60 gap-2">
+                        <span class="font-bold text-slate-300 w-24">본령 (시작)</span>
+                        <input type="text" id="bell-url-start" class="flex-1 bg-slate-800 border border-slate-600 rounded px-2 py-1 text-slate-200 w-full font-mono text-xs focus:outline-none focus:border-indigo-500">
+                        <button onclick="playTestBell('start')" class="bg-indigo-600/80 hover:bg-indigo-500 px-3 py-1 rounded text-white font-medium flex items-center gap-1 self-end sm:self-auto">
+                            <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> 테스트
+                        </button>
+                    </div>
+                    <!-- 종료령 -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-900/60 p-3 rounded-lg border border-slate-700/60 gap-2">
+                        <span class="font-bold text-slate-300 w-24">종료령 (종료)</span>
+                        <input type="text" id="bell-url-end" class="flex-1 bg-slate-800 border border-slate-600 rounded px-2 py-1 text-slate-200 w-full font-mono text-xs focus:outline-none focus:border-indigo-500">
+                        <button onclick="playTestBell('end')" class="bg-indigo-600/80 hover:bg-indigo-500 px-3 py-1 rounded text-white font-medium flex items-center gap-1 self-end sm:self-auto">
+                            <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> 테스트
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <!-- TTS Text Setting -->
             <div class="space-y-2 pt-2">
@@ -244,20 +238,29 @@
     <!-- MAIN JAVASCRIPT APP LOGIC -->
     <script>
         // --- 1. SUBJECT DEFINITIONS & DEFAULT TIMES ---
+        // Fixed standard order: 국어 -> 수학 -> 영어 -> 한국사 -> 사회탐구 -> 과학탐구
         const SUBJECT_PRESETS = [
-            { id: 'korean', name: '국어', startTime: '08:40', duration: 80, hasListening: false },
-            { id: 'math', name: '수학', startTime: '10:30', duration: 100, hasListening: false },
-            { id: 'english', name: '영어', startTime: '13:10', duration: 70, hasListening: true, listeningStartTime: '13:07:30' },
-            { id: 'history', name: '한국사', startTime: '14:50', duration: 30, hasListening: false },
-            { id: 'social', name: '사회탐구', startTime: '15:35', duration: 40, hasListening: false },
-            { id: 'science', name: '과학탐구', startTime: '16:30', duration: 40, hasListening: false }
+            { id: 'korean', name: '국어', startTime: '08:40', duration: 80, hasListening: false, order: 1 },
+            { id: 'math', name: '수학', startTime: '10:30', duration: 100, hasListening: false, order: 2 },
+            { id: 'english', name: '영어', startTime: '13:10', duration: 70, hasListening: true, listeningStartTime: '13:07:30', order: 3 },
+            { id: 'history', name: '한국사', startTime: '14:50', duration: 30, hasListening: false, order: 4 },
+            { id: 'social', name: '사회탐구', startTime: '15:35', duration: 40, hasListening: false, order: 5 },
+            { id: 'science', name: '과학탐구', startTime: '16:30', duration: 40, hasListening: false, order: 6 }
         ];
+
+        // Default Web Server Audio URLs (without bell_ prefix)
+        const DEFAULT_BELL_URLS = {
+            prep10: '/audio/prep10.mp3',
+            prep5: '/audio/prep5.mp3',
+            start: '/audio/start.mp3',
+            end: '/audio/end.mp3'
+        };
 
         // State Management
         let selectedSubjects = ['korean', 'math', 'english', 'history', 'social', 'science'];
         let subjectSchedules = []; // Computed full schedules
         let audioFiles = {}; // Listening MP3 files per subject
-        let customBellFiles = {}; // Custom Bell MP3 files
+        let serverBellUrls = { ...DEFAULT_BELL_URLS };
         let isRunning = false;
         let isPaused = false;
         let currentVirtualTime = null; // Simulated JS Date object
@@ -276,22 +279,35 @@
         // Web Audio API Synth Bell Generator
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+        // Helper function to keep subjects in strict standard order (국수영한사과)
+        function sortSubjectsByStandardOrder(subjectIds) {
+            return [...subjectIds].sort((a, b) => {
+                const orderA = SUBJECT_PRESETS.find(p => p.id === a)?.order || 99;
+                const orderB = SUBJECT_PRESETS.find(p => p.id === b)?.order || 99;
+                return orderA - orderB;
+            });
+        }
+
         // --- 2. INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
+            selectedSubjects = sortSubjectsByStandardOrder(selectedSubjects);
             renderSubjectSelector();
             updateSelectedSubjectsUI();
             setupEventListeners();
-            toggleBellSourceUI();
+            initServerUrlInputs();
         });
 
-        function toggleBellSourceUI() {
-            const bellType = document.querySelector('input[name="bell-sound-type"]:checked')?.value;
-            const serverSec = document.getElementById('server-bell-section');
-            const customSec = document.getElementById('bell-files-section');
+        function initServerUrlInputs() {
+            document.getElementById('bell-url-prep10').value = serverBellUrls.prep10;
+            document.getElementById('bell-url-prep5').value = serverBellUrls.prep5;
+            document.getElementById('bell-url-start').value = serverBellUrls.start;
+            document.getElementById('bell-url-end').value = serverBellUrls.end;
+        }
 
-            if (serverSec) serverSec.classList.toggle('hidden', bellType !== 'server');
-            if (customSec) customSec.classList.toggle('hidden', bellType !== 'custom');
+        function resetDefaultServerUrls() {
+            serverBellUrls = { ...DEFAULT_BELL_URLS };
+            initServerUrlInputs();
         }
 
         // --- 3. UI RENDERING & BUILDERS ---
@@ -326,6 +342,8 @@
             } else {
                 selectedSubjects.push(id);
             }
+            // Always sort in standard order: 국어 -> 수학 -> 영어 -> 한국사 -> 사회탐구 -> 과학탐구
+            selectedSubjects = sortSubjectsByStandardOrder(selectedSubjects);
             renderSubjectSelector();
             updateSelectedSubjectsUI();
         }
@@ -333,53 +351,61 @@
         function updateSelectedSubjectsUI() {
             const container = document.getElementById('selected-subjects-container');
             
-            // Build schedule items
+            // Build schedule items (sorted according to standard order)
+            selectedSubjects = sortSubjectsByStandardOrder(selectedSubjects);
+            
             subjectSchedules = selectedSubjects.map(id => {
                 const preset = SUBJECT_PRESETS.find(p => p.id === id);
                 return {
                     ...preset,
                     customStartTime: preset.startTime,
-                    customListeningTime: preset.listeningStartTime || preset.startTime,
-                    customDuration: preset.duration
+                    customDuration: preset.duration,
+                    customListeningStartTime: preset.listeningStartTime || preset.startTime + ':00'
                 };
             });
 
             container.innerHTML = subjectSchedules.map((sub, index) => `
-                <div class="bg-slate-900/80 border border-slate-700/70 p-4 rounded-xl flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <span class="w-6 h-6 rounded-full bg-indigo-600/30 text-indigo-300 font-bold text-xs flex items-center justify-center border border-indigo-500/30">${index + 1}</span>
-                        <div>
-                            <h4 class="font-bold text-white text-base">${sub.name}</h4>
-                            <p class="text-xs text-slate-400">${sub.hasListening ? '영어 듣기 평가 방송 포함 (본령 없음)' : '일반 모의고사'}</p>
+                <div class="bg-slate-900/80 border border-slate-700/70 p-4 rounded-xl flex flex-col gap-3">
+                    <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between border-b border-slate-800 pb-2">
+                        <div class="flex items-center gap-3">
+                            <span class="w-6 h-6 rounded-full bg-indigo-600/30 text-indigo-300 font-bold text-xs flex items-center justify-center border border-indigo-500/30">${index + 1}</span>
+                            <div>
+                                <h4 class="font-bold text-white text-base">${sub.name}</h4>
+                                <p class="text-xs text-slate-400">${sub.hasListening ? '영어 듣기 평가 포함' : '일반 모의고사'}</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto text-sm">
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-xs text-slate-400">시험 시작 시각:</span>
-                            <input type="time" value="${sub.customStartTime}" onchange="updateSubjectTime('${sub.id}', 'startTime', this.value)" class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500">
-                        </div>
-                        ${sub.hasListening ? `
+                        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto text-sm">
                             <div class="flex items-center gap-1.5">
-                                <span class="text-xs text-indigo-300 font-semibold">듣기방송 시각:</span>
-                                <input type="time" step="1" value="${sub.customListeningTime}" onchange="updateSubjectTime('${sub.id}', 'listeningTime', this.value)" class="bg-slate-800 border border-indigo-500/60 rounded px-2 py-1 text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500">
+                                <span class="text-xs text-slate-400">시작시간:</span>
+                                <input type="time" value="${sub.customStartTime}" onchange="updateSubjectTime('${sub.id}', 'startTime', this.value)" class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500">
                             </div>
-                        ` : ''}
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-xs text-slate-400">시험시간(분):</span>
-                            <input type="number" value="${sub.customDuration}" onchange="updateSubjectTime('${sub.id}', 'duration', this.value)" class="w-16 bg-slate-800 border border-slate-600 rounded px-2 py-1 text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500">
-                        </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-xs text-slate-400">시험시간(분):</span>
+                                <input type="number" value="${sub.customDuration}" onchange="updateSubjectTime('${sub.id}', 'duration', this.value)" class="w-16 bg-slate-800 border border-slate-600 rounded px-2 py-1 text-slate-100 font-mono text-xs focus:outline-none focus:border-indigo-500">
+                            </div>
 
-                        ${sub.hasListening ? `
-                            <div class="flex items-center gap-2">
-                                <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs px-3 py-1.5 rounded-lg text-indigo-300 flex items-center gap-1">
-                                    <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-                                    <span>${audioFiles[sub.id] ? audioFiles[sub.id].name : '듣기 MP3 첨부'}</span>
-                                    <input type="file" accept="audio/*" onchange="handleAudioUpload('${sub.id}', this)" class="hidden">
-                                </label>
-                            </div>
-                        ` : ''}
+                            ${sub.hasListening ? `
+                                <div class="flex items-center gap-2">
+                                    <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs px-3 py-1.5 rounded-lg text-indigo-300 flex items-center gap-1">
+                                        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                        <span>${audioFiles[sub.id] ? audioFiles[sub.id].name : '듣기 MP3 첨부'}</span>
+                                        <input type="file" accept="audio/*" onchange="handleAudioUpload('${sub.id}', this)" class="hidden">
+                                    </label>
+                                </div>
+                            ` : ''}
+                        </div>
                     </div>
+
+                    ${sub.hasListening ? `
+                        <div class="flex items-center justify-between bg-slate-800/40 p-2.5 rounded-lg border border-indigo-500/20 text-xs">
+                            <div class="flex items-center gap-2 text-indigo-300 font-semibold">
+                                <i data-lucide="headphones" class="w-4 h-4"></i>
+                                <span>영어 듣기평가 방송 시작 시각:</span>
+                            </div>
+                            <input type="time" step="1" value="${sub.customListeningStartTime}" onchange="updateSubjectTime('${sub.id}', 'listeningStartTime', this.value)" class="bg-slate-900 border border-indigo-500/40 rounded px-2.5 py-1 text-indigo-200 font-mono text-xs focus:outline-none focus:border-indigo-400">
+                        </div>
+                    ` : ''}
                 </div>
             `).join('');
             lucide.createIcons();
@@ -389,8 +415,10 @@
             const sub = subjectSchedules.find(s => s.id === id);
             if (sub) {
                 if (key === 'duration') sub.customDuration = parseInt(val) || 0;
-                if (key === 'startTime') sub.customStartTime = val;
-                if (key === 'listeningTime') sub.customListeningTime = val;
+                if (key === 'startTime') {
+                    sub.customStartTime = val;
+                }
+                if (key === 'listeningStartTime') sub.customListeningStartTime = val;
             }
         }
 
@@ -401,53 +429,32 @@
             }
         }
 
-        // --- 4. BELL SOUND MELODY SYNTHESIS (School Bell Music) ---
+        // --- 4. BELL SOUND MELODY SYNTHESIS (Fallback School Bell Music) ---
         function playWestminsterBell() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             
-            // Traditional 8-note Westminster School Chime Melody (E4, G#4, F#4, B3 / E4, F#4, G#4, E4)
             const notes = [
-                { f: 329.63, d: 0.65 }, { f: 415.30, d: 0.65 }, { f: 369.99, d: 0.65 }, { f: 246.94, d: 1.1 },
-                { f: 329.63, d: 0.65 }, { f: 369.99, d: 0.65 }, { f: 415.30, d: 0.65 }, { f: 329.63, d: 1.5 }
+                { f: 329.63, d: 0.6 }, { f: 415.30, d: 0.6 }, { f: 369.99, d: 0.6 }, { f: 246.94, d: 1.2 }
             ];
-
-            // Bell overtone harmonic structure for authentic metallic chime resonance
-            const overtones = [
-                { mult: 1.00, gain: 0.35, decay: 1.0 },
-                { mult: 2.00, gain: 0.18, decay: 0.75 },
-                { mult: 3.01, gain: 0.10, decay: 0.5 },
-                { mult: 4.18, gain: 0.06, decay: 0.35 },
-                { mult: 5.43, gain: 0.03, decay: 0.25 }
-            ];
-
-            let noteStartTime = audioCtx.currentTime;
-
+            
+            let now = audioCtx.currentTime;
             notes.forEach((note) => {
-                overtones.forEach(ot => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    const filter = audioCtx.createBiquadFilter();
-
-                    osc.type = 'sine';
-                    osc.frequency.value = note.f * ot.mult;
-
-                    // Lowpass filter to smooth sharp high frequencies
-                    filter.type = 'lowpass';
-                    filter.frequency.value = 3200;
-
-                    const ringTime = note.d * ot.decay;
-
-                    gain.gain.setValueAtTime(ot.gain, noteStartTime);
-                    gain.gain.exponentialRampToValueAtTime(0.00001, noteStartTime + ringTime + 0.6);
-
-                    osc.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(audioCtx.destination);
-
-                    osc.start(noteStartTime);
-                    osc.stop(noteStartTime + ringTime + 0.8);
-                });
-                noteStartTime += note.d;
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.value = note.f;
+                
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + note.d + 0.5);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(now);
+                osc.stop(now + note.d + 0.6);
+                
+                now += note.d;
             });
         }
 
@@ -455,28 +462,19 @@
             const bellSoundType = document.querySelector('input[name="bell-sound-type"]:checked')?.value;
             
             if (bellSoundType === 'server') {
-                // 웹서버 내부 자동 연결 상대 경로 (화면 비노출)
-                const serverPaths = {
-                    prep10: './audio/prep10.mp3',
-                    prep5: './audio/prep5.mp3',
-                    start: './audio/start.mp3',
-                    end: './audio/end.mp3'
-                };
-                const soundPath = serverPaths[type] || `./audio/${type}.mp3`;
-                
-                const audio = new Audio(soundPath);
-                audio.play().catch(err => {
-                    console.warn(`[서버 음원 재생 실패] ${soundPath} - 내장 멜로디로 대체 재생합니다.`, err);
-                    playWestminsterBell();
-                });
-            } else if (bellSoundType === 'custom' && customBellFiles[type]) {
-                const url = URL.createObjectURL(customBellFiles[type]);
-                const audio = new Audio(url);
-                audio.play();
-            } else {
-                // Default Synthesized Westminster Melody Music
-                playWestminsterBell();
+                const url = document.getElementById(`bell-url-${type}`)?.value || serverBellUrls[type];
+                if (url) {
+                    const audio = new Audio(url);
+                    audio.play().catch(err => {
+                        console.warn(`[Audio Error] Web server audio at '${url}' failed to load. Falling back to synth melody.`, err);
+                        playWestminsterBell();
+                    });
+                    return;
+                }
             }
+            
+            // Fallback / Synth Melody
+            playWestminsterBell();
         }
 
         function playTestBell(type) {
@@ -502,14 +500,13 @@
         function calculateFullTimeline() {
             let events = [];
 
-            subjectSchedules.forEach(sub => {
-                const parts = sub.customStartTime.split(':').map(Number);
-                const h = parts[0] || 0;
-                const m = parts[1] || 0;
-                const s = parts[2] || 0;
+            // Sort schedules explicitly before timeline generation
+            const sortedSchedules = [...subjectSchedules].sort((a, b) => a.order - b.order);
 
+            sortedSchedules.forEach(sub => {
+                const [h, m] = sub.customStartTime.split(':').map(Number);
                 const baseDate = new Date();
-                baseDate.setHours(h, m, s, 0);
+                baseDate.setHours(h, m, 0, 0);
 
                 const prep10 = new Date(baseDate.getTime() - 10 * 60000);
                 const prep5 = new Date(baseDate.getTime() - 5 * 60000);
@@ -517,31 +514,34 @@
                 const remain10 = new Date(baseDate.getTime() + (sub.customDuration - 10) * 60000);
                 const end = new Date(baseDate.getTime() + sub.customDuration * 60000);
 
-                events.push({ id: `${sub.id}-prep10`, subject: sub.name, type: '예비령', time: prep10, action: 'prep10' });
-                events.push({ id: `${sub.id}-prep5`, subject: sub.name, type: '준비령', time: prep5, action: 'prep5' });
+                events.push({ id: `${sub.id}-prep10`, subject: sub.name, type: '예비령', time: prep10, action: 'prep10', order: sub.order });
+                events.push({ id: `${sub.id}-prep5`, subject: sub.name, type: '준비령', time: prep5, action: 'prep5', order: sub.order });
+                events.push({ id: `${sub.id}-start`, subject: sub.name, type: '본령 (시작)', time: start, action: 'start', order: sub.order });
 
-                // 영어 과목 및 듣기평가 포함 과목은 실제 수능 규정에 맞춰 본령(시작 종소리)을 생성하지 않음
-                if (sub.id !== 'english' && !sub.hasListening) {
-                    events.push({ id: `${sub.id}-start`, subject: sub.name, type: '본령 (시작)', time: start, action: 'start' });
-                }
+                // Optional English Listening Evaluation Event
+                if (sub.hasListening && sub.customListeningStartTime) {
+                    const parts = sub.customListeningStartTime.split(':').map(Number);
+                    const listH = parts[0] || 0;
+                    const listM = parts[1] || 0;
+                    const listS = parts[2] || 0;
 
-                if (sub.hasListening) {
-                    const lParts = (sub.customListeningTime || sub.customStartTime).split(':').map(Number);
                     const listeningDate = new Date();
-                    listeningDate.setHours(lParts[0] || 0, lParts[1] || 0, lParts[2] || 0, 0);
+                    listeningDate.setHours(listH, listM, listS, 0);
 
-                    events.push({
-                        id: `${sub.id}-listening`,
-                        subject: sub.name,
-                        type: '듣기평가 방송',
-                        time: listeningDate,
-                        action: 'listening',
-                        subId: sub.id
+                    events.push({ 
+                        id: `${sub.id}-listening`, 
+                        subject: sub.name, 
+                        type: '듣기평가 방송', 
+                        time: listeningDate, 
+                        action: 'listening', 
+                        hasListening: true, 
+                        subId: sub.id, 
+                        order: sub.order 
                     });
                 }
 
-                events.push({ id: `${sub.id}-remain10`, subject: sub.name, type: '10분전 TTS', time: remain10, action: 'remain10' });
-                events.push({ id: `${sub.id}-end`, subject: sub.name, type: '종료령', time: end, action: 'end' });
+                events.push({ id: `${sub.id}-remain10`, subject: sub.name, type: '10분전 TTS', time: remain10, action: 'remain10', order: sub.order });
+                events.push({ id: `${sub.id}-end`, subject: sub.name, type: '종료령', time: end, action: 'end', order: sub.order });
             });
 
             return events.sort((a, b) => a.time - b.time);
@@ -683,91 +683,11 @@
                 document.getElementById('next-bell-text').innerText = `모든 시험 방송 종료`;
             }
 
-            // Update Active Subject / Break Status UI
-            updateStatusAndBreakUI(now);
-        }
-
-        function updateStatusAndBreakUI(now) {
-            let isBreak = false;
-            let activeSubjectName = null;
-
-            // Sort subject schedules by independent start time
-            const sortedSubs = [...subjectSchedules].map(sub => {
-                const [h, m] = sub.customStartTime.split(':').map(Number);
-                const start = new Date();
-                start.setHours(h, m, 0, 0);
-                const end = new Date(start.getTime() + sub.customDuration * 60000);
-                return { ...sub, startDate: start, endDate: end };
-            }).sort((a, b) => a.startDate - b.startDate);
-
-            for (let i = 0; i < sortedSubs.length; i++) {
-                const sub = sortedSubs[i];
-                // Check if currently taking an exam (from 10min prep till finish)
-                if (now >= new Date(sub.startDate.getTime() - 10 * 60000) && now < sub.endDate) {
-                    activeSubjectName = sub.name;
-                    break;
-                }
-                // Check if in break time following this exam
-                if (now >= sub.endDate) {
-                    const nextSub = sortedSubs[i + 1];
-                    if (nextSub && now < nextSub.startDate) {
-                        isBreak = true;
-                        break;
-                    }
-                }
+            // Update Active Subject Badge
+            const activeSub = timeline.find(e => now >= e.time && e.action !== 'end');
+            if (activeSub) {
+                document.getElementById('current-subject-badge').innerText = `${activeSub.subject} 진행 중`;
             }
-
-            const badge = document.getElementById('current-subject-badge');
-            const breakBanner = document.getElementById('break-banner');
-
-            if (isBreak) {
-                badge.innerText = '쉬는 시간';
-                if (breakBanner) breakBanner.classList.remove('hidden');
-            } else {
-                if (breakBanner) breakBanner.classList.add('hidden');
-                if (activeSubjectName) {
-                    badge.innerText = `${activeSubjectName} 진행 중`;
-                } else {
-                    badge.innerText = '과목 준비 대기 중';
-                }
-            }
-        }
-
-        function skipBreak() {
-            if (!currentVirtualTime) return;
-
-            // Find next subject scheduled after current time
-            const sortedSubs = [...subjectSchedules].map(sub => {
-                const [h, m] = sub.customStartTime.split(':').map(Number);
-                const start = new Date();
-                start.setHours(h, m, 0, 0);
-                return { ...sub, startDate: start };
-            }).sort((a, b) => a.startDate - b.startDate);
-
-            const nextSub = sortedSubs.find(sub => sub.startDate > currentVirtualTime);
-            if (!nextSub) return;
-
-            // Set virtual time to 10 minutes and 5 seconds before the next subject's start time
-            const targetTime = new Date(nextSub.startDate.getTime() - (10 * 60 + 5) * 1000);
-            currentVirtualTime = targetTime;
-
-            // Clear any future triggered events so they execute properly upon reaching them
-            const timeline = calculateFullTimeline();
-            triggeredEvents.forEach(id => {
-                const ev = timeline.find(e => e.id === id);
-                if (ev && ev.time >= currentVirtualTime) {
-                    triggeredEvents.delete(id);
-                }
-            });
-
-            if (activeAudio) {
-                activeAudio.pause();
-                activeAudio = null;
-            }
-
-            updateClocks(currentVirtualTime);
-            checkTimelineEvents(currentVirtualTime);
-            renderTimelineUI(timeline);
         }
 
         function executeEventAction(event) {
@@ -780,7 +700,8 @@
             } else if (event.action === 'start') {
                 playBellSound('start');
             } else if (event.action === 'listening') {
-                if (audioFiles[event.subId]) {
+                // Play English Listening Audio File
+                if (event.hasListening && audioFiles[event.subId]) {
                     if (activeAudio) activeAudio.pause();
                     const url = URL.createObjectURL(audioFiles[event.subId]);
                     activeAudio = new Audio(url);
@@ -826,30 +747,24 @@
             const h = String(date.getHours()).padStart(2, '0');
             const m = String(date.getMinutes()).padStart(2, '0');
             const s = String(date.getSeconds()).padStart(2, '0');
-            return s === '00' ? `${h}:${m}` : `${h}:${m}:${s}`;
+            return `${h}:${m}:${s}`;
         }
 
         // --- 6. EVENT LISTENERS & CONTROLS ---
         function setupEventListeners() {
             document.getElementById('start-exam-btn').addEventListener('click', startExamSystem);
-            document.getElementById('skip-break-btn').addEventListener('click', skipBreak);
 
             // Settings Modal Toggle
             const modal = document.getElementById('settings-modal');
             document.getElementById('open-settings-btn').addEventListener('click', () => modal.classList.remove('hidden'));
             document.getElementById('close-settings-btn').addEventListener('click', () => modal.classList.add('hidden'));
-            document.getElementById('save-settings-btn').addEventListener('click', () => modal.classList.add('hidden'));
-
-            // File attachments for custom bells
-            ['prep10', 'prep5', 'start', 'end'].forEach(type => {
-                const el = document.getElementById(`bell-file-${type}`);
-                if (el) {
-                    el.addEventListener('change', (e) => {
-                        if (e.target.files && e.target.files[0]) {
-                            customBellFiles[type] = e.target.files[0];
-                        }
-                    });
-                }
+            document.getElementById('save-settings-btn').addEventListener('click', () => {
+                // Save updated URL paths
+                serverBellUrls.prep10 = document.getElementById('bell-url-prep10').value;
+                serverBellUrls.prep5 = document.getElementById('bell-url-prep5').value;
+                serverBellUrls.start = document.getElementById('bell-url-start').value;
+                serverBellUrls.end = document.getElementById('bell-url-end').value;
+                modal.classList.add('hidden');
             });
 
             // Pause / Resume Toggle
@@ -898,3 +813,4 @@
     </script>
 </body>
 </html>
+
