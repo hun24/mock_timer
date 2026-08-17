@@ -281,85 +281,86 @@
     <!-- MAIN JAVASCRIPT APP LOGIC -->
     <script>
         // --- 1. SUBJECT DEFINITIONS & DEFAULT TIMES & SUBJECT TTS PRESETS ---
+        // Warning minute offset: Korean/Math/English = 10 mins before, History/Social/Science = 5 mins before
         const SUBJECT_PRESETS = [
-            { id: 'korean', name: '국어', startTime: '08:40', duration: 80, hasListening: false, order: 1 },
-            { id: 'math', name: '수학', startTime: '10:30', duration: 100, hasListening: false, order: 2 },
-            { id: 'english', name: '영어', startTime: '13:10', duration: 70, hasListening: true, listeningStartTime: '13:07:30', order: 3 },
-            { id: 'history', name: '한국사', startTime: '14:50', duration: 30, hasListening: false, order: 4 },
-            { id: 'social', name: '사회탐구', startTime: '15:35', duration: 40, hasListening: false, order: 5 },
-            { id: 'science', name: '과학탐구', startTime: '16:30', duration: 40, hasListening: false, order: 6 }
+            { id: 'korean', name: '국어', startTime: '08:40', duration: 80, hasListening: false, warnOffset: 10, order: 1 },
+            { id: 'math', name: '수학', startTime: '10:30', duration: 100, hasListening: false, warnOffset: 10, order: 2 },
+            { id: 'english', name: '영어', startTime: '13:10', duration: 70, hasListening: true, listeningStartTime: '13:07:30', warnOffset: 10, order: 3 },
+            { id: 'history', name: '한국사', startTime: '14:50', duration: 30, hasListening: false, warnOffset: 5, order: 4 },
+            { id: 'social', name: '사회탐구', startTime: '15:35', duration: 40, hasListening: false, warnOffset: 5, order: 5 },
+            { id: 'science', name: '과학탐구', startTime: '16:30', duration: 40, hasListening: false, warnOffset: 5, order: 6 }
         ];
 
         // Subject Specific Default TTS Texts
         const DEFAULT_SUBJECT_TTS = {
             korean: {
-                prep10: "국어 영역 시험 시작 10분 전입니다. 수험생은 입실하여 답안지 성명 및 수험번호를 정확히 작성해 주시기 바랍니다.",
-                prep5: "국어 영역 시험 시작 5분 전입니다. 문제지를 확인하고 개봉하지 마시기 바랍니다.",
-                start: "1교시 국어 영역 시험이 시작되었습니다. 문제지 파봉 상태를 확인 후 답안을 작성해 주시기 바랍니다.",
-                remain10: "국어 영역 시험 종료 10분 전입니다. 답안지 마킹 상태를 최종 확인해 주시기 바랍니다.",
-                end: "1교시 국어 영역 시험이 종료되었습니다. 필기도구를 놓고 답안지를 오른쪽에 정돈해 주시기 바랍니다."
+                prep10: "제 1교시 예비령입니다. 감독관께서는 문제지와 답안지 봉투를 개봉하여 수량을 확인하여 주시고, 답안지를 책상 오른쪽에 배부해주시되, 결시자 책상 위에도 놓아주십시오. 수험생은 1교시 국어영역 답안지인지 확인하십시오. 수험생은 답안지 뒷면에 표기된 수험생 준수사항을 읽고, 그에 따라 답안지를 작성하시기 바랍니다. 성명과 수험번호를 기입하고 답안지 작성시에는 반드시 검은색 컴퓨터용 사인펜만을 사용하십시오.",
+                prep5: "제 1교시 준비령입니다. 수험생은 두 손을 책상 아래로 내린 다음 조용히 기다리며, 감독관께서는 문제지를 수험생 왼쪽에 배부해주시되, 결시자 책상 위에도 놓아주십시오. 수험생은 표지를 제외한 문제지 면수가 16면인지 확인한 다음, 문제지에 성명과 수험번호를 기입하십시오. 수험생은 문제지 표지에 제시된 필적확인문구를 답안지의 필적확인란에 정자로 기재하십시오. 수험생은 본령이 울리기 전까지 절대 문제지 표지를 미리 넘기지 않도록 주의하십시오.",
+                start: "제 1교시 본령입니다.",
+                remainWarn: "제 1교시 종료 10분전입니다.",
+                end: "제 1교시 종료령입니다. 수험생은 필기도구를 놓고 답안지는 엎어서 오른쪽에, 문제지는 표지를 덮어서 왼쪽에 놓고 조용히 기다리십시오. 감독관께서는 답안지와 문제지를 수험번호순으로 회수하여 주시고, 수량을 확인하여 주십시오."
             },
             math: {
-                prep10: "수학 영역 시험 시작 10분 전입니다. 수험생은 입실하여 답안지 인적사항 및 단답형 답안 작성을 준비해 주시기 바랍니다.",
-                prep5: "수학 영역 시험 시작 5분 전입니다. 문제지 배부를 확인하시기 바랍니다.",
-                start: "2교시 수학 영역 시험이 시작되었습니다. 문제지를 확인하고 답안 작성을 시작해 주시기 바랍니다.",
-                remain10: "수학 영역 시험 종료 10분 전입니다. 단답형 OMR 마킹 상태를 다시 한 번 확인해 주시기 바랍니다.",
-                end: "2교시 수학 영역 시험이 종료되었습니다. 필기도구를 정돈하고 수거 안내에 따라주시기 바랍니다."
+                prep10: "제 2교시 예비령입니다. 감독관께서는 문제지와 답안지 봉투를 개봉하여 수량을 확인하여 주시고, 답안지를 책상 오른쪽에 배부해주시되, 결시자 책상 위에도 놓아주십시오. 수험생은 2교시 수학영역 답안지인지 확인하십시오. 수험생은 답안지 뒷면에 표기된 수험생 준수사항을 읽고, 그에 따라 답안지를 작성하시기 바랍니다. 성명과 수험번호를 기입하고 답안지 작성시에는 반드시 검은색 컴퓨터용 사인펜만을 사용하십시오.",
+                prep5: "제 2교시 준비령입니다. 수험생은 두 손을 책상 아래로 내린 다음 조용히 기다리며, 감독관께서는 문제지를 수험생 왼쪽에 배부해주시되, 결시자 책상 위에도 놓아주십시오. 수험생은 표지를 제외한 문제지 면수가 12면인지 확인한 다음, 문제지에 성명과 수험번호를 기입하십시오. 수험생은 문제지 표지에 제시된 필적확인문구를 답안지의 필적확인란에 정자로 기재하십시오. 수험생은 본령이 울리기 전까지 절대 문제지 표지를 미리 넘기지 않도록 주의하십시오.",
+                start: "제 2교시 본령입니다.",
+                remainWarn: "제 2교시 종료 10분전입니다.",
+                end: "제 2교시 종료령입니다. 수험생은 필기도구를 놓고 답안지는 엎어서 오른쪽에, 문제지는 표지를 덮어서 왼쪽에 놓고 조용히 기다리십시오. 감독관께서는 답안지와 문제지를 수험번호순으로 회수하여 주시고, 수량을 확인하여 주십시오."
             },
             english: {
-                prep10: "영어 영역 시험 시작 10분 전입니다. 본 시험은 영어 듣기 평가가 포함되어 있으니 방송 음량을 확인하시기 바랍니다.",
-                prep5: "영어 영역 시험 시작 5분 전입니다. 안내 방송 후 듣기 평가가 바로 시작되므로 정숙해 주시기 바랍니다.",
-                start: "3교시 영어 영역 시험이 시작되었습니다.",
-                remain10: "영어 영역 시험 종료 10분 전입니다. 답안지 마킹 상태를 확인해 주시기 바랍니다.",
-                end: "3교시 영어 영역 시험이 종료되었습니다. 필기도구를 놓고 정돈해 주시기 바랍니다."
+                prep10: "제 3교시 예비령입니다. 감독관께서는 문제지와 답안지 봉투를 개봉하여 수량을 확인하여 주시고, 답안지를 책상 오른쪽에 배부해주시되, 결시자 책상 위에도 놓아주십시오. 수험생은 3교시 영어영역 답안지인지 확인하십시오. 수험생은 답안지 뒷면에 표기된 수험생 준수사항을 읽고, 그에 따라 답안지를 작성하시기 바랍니다. 성명과 수험번호를 기입하고 답안지 작성시에는 반드시 검은색 컴퓨터용 사인펜만을 사용하십시오.",
+                prep5: "제 3교시 준비령입니다. 수험생은 두 손을 책상 아래로 내린 다음 조용히 기다리며, 감독관께서는 문제지를 수험생 왼쪽에 배부해주시되, 결시자 책상 위에도 놓아주십시오. 수험생은 표지를 제외한 문제지 면수가 8면인지 확인한 다음, 문제지에 성명과 수험번호를 기입하십시오. 수험생은 문제지 표지에 제시된 필적확인문구를 답안지의 필적확인란에 정자로 기재하십시오. 영어 영역은 13시 7분부터 영어듣기 음질 테스트 및 안내방송이 시작되며, 13시 10분부터 별도의 타종 없이 듣기평가 방송이 시작됩니다. 수험생은 방송에서 문제지 표지를 넘기라는 지시가 있기 전까지 절대 문제지 표지를 미리 넘기지 않도록 주의하십시오.",
+                start: "",
+                remainWarn: "제 3교시 종료 10분전입니다.",
+                end: "제 3교시 종료령입니다. 수험생은 필기도구를 놓고 답안지는 엎어서 오른쪽에, 문제지는 표지를 덮어서 왼쪽에 놓고 조용히 기다리십시오. 감독관께서는 답안지와 문제지를 수험번호순으로 회수하여 주시고, 수량을 확인하여 주십시오."
             },
             history: {
-                prep10: "한국사 영역 시험 시작 10분 전입니다. 한국사는 필수 응시 과목입니다. 수험생은 자리에 앉아주시기 바랍니다.",
-                prep5: "한국사 영역 시험 시작 5분 전입니다. 문제지를 확인해 주시기 바랍니다.",
-                start: "4교시 한국사 영역 시험이 시작되었습니다.",
-                remain10: "한국사 영역 시험 종료 10분 전입니다. 답안지 마킹을 점검해 주시기 바랍니다.",
-                end: "4교시 한국사 영역 시험이 종료되었습니다. 답안지를 오른쪽으로 정돈해 주시기 바랍니다."
+                prep10: "제 4교시 한국사 영역 예비령입니다. 한국사는 필수 영역으로 미응시할 경우 수능 응시 자체가 무효 처리되고, 성적통지표가 제공되지 않으니 유의하시기 바랍니다. 감독관께서는 한국사 영역 문제지와 답안지 봉투를 개봉하여 수량을 확인하여 주시고, 답안지를 책상 오른쪽에 배부해주시되, 결시자 책상 위에도 놓아주십시오. 수험생은 4교시 한국사영역 답안지인지 확인하십시오. 수험생은 답안지 뒷면에 표기된 수험생 준수사항을 읽고, 그에 따라 답안지를 작성하시기 바랍니다. 성명과 수험번호를 기입하고 답안지 작성시에는 반드시 검은색 컴퓨터용 사인펜만을 사용하십시오.",
+                prep5: "제 4교시 한국사 영역 준비령입니다. 수험생은 두 손을 책상 아래로 내린 다음 조용히 기다리며, 감독관께서는 문제지를 수험생 왼쪽에 배부해주시되, 결시자 책상 위에도 놓아주십시오. 수험생은 표지를 제외한 문제지 면수가 4면인지 확인한 다음, 문제지에 성명과 수험번호를 기입하십시오. 수험생은 문제지 표지에 제시된 필적확인문구를 답안지의 필적확인란에 정자로 기재하십시오. 수험생은 본령이 울리기 전까지 절대 문제지 표지를 미리 넘기지 않도록 주의하십시오.",
+                start: "제 4교시 한국사 영역 본령입니다.",
+                remainWarn: "제 4교시 중 한국사 영역 시험 종료 5분전입니다.",
+                end: "제 4교시 한국사 영역 종료령입니다. 수험생은 필기도구를 놓고 답안지는 엎어서 오른쪽에, 문제지는 표지를 덮어서 왼쪽에 놓고 조용히 기다리십시오. 감독관께서는 답안지와 문제지를 수험번호순으로 회수하여 주시고, 수량을 확인하여 주십시오."
             },
             social: {
-                prep10: "사회탐구 영역 시험 시작 10분 전입니다. 본인이 선택한 과목의 문제지 순서를 확인하시기 바랍니다.",
-                prep5: "사회탐구 영역 시험 시작 5분 전입니다. 정숙하여 주시기 바랍니다.",
-                start: "사회탐구 영역 시험이 시작되었습니다.",
-                remain10: "사회탐구 영역 시험 종료 10분 전입니다. 답안지 마킹을 확인해 주시기 바랍니다.",
-                end: "사회탐구 영역 시험이 종료되었습니다. 답안지를 정돈해 주시기 바랍니다."
+                prep10: "제 4교시 탐구 영역 예비령입니다. 감독관께서는 문제지와 답안지 봉투를 개봉하여 수량을 확인하여 주시고, 답안지를 책상 오른쪽에 배부해주시되, 결시자 책상 위에도 놓아주십시오. 수험생은 4교시 탐구영역 답안지인지 확인하십시오. 수험생은 답안지 뒷면에 표기된 수험생 준수사항을 읽고, 그에 따라 답안지를 작성하시기 바랍니다. 성명과 수험번호를 기입하고 답안지 작성시에는 반드시 검은색 컴퓨터용 사인펜만을 사용하십시오.",
+                prep5: "제 4교시 탐구 영역 준비령입니다. 수험생은 두 손을 책상 아래로 내린 다음 조용히 기다리며, 감독관께서는 문제지를 수험생 왼쪽에 배부해주시되, 결시자 책상 위에도 놓아주십시오. 수험생은 표지를 제외한 문제지 면수가 6면인지 확인한 다음, 문제지에 성명과 수험번호를 기입하십시오. 수험생은 문제지 표지에 제시된 필적확인문구를 답안지의 필적확인란에 정자로 기재하십시오. 수험생은 본령이 울리기 전까지 절대 문제지 표지를 미리 넘기지 않도록 주의하십시오.",
+                start: "제 4교시 사회탐구 영역 본령입니다.",
+                remainWarn: "제 4교시 중 사회탐구 영역 시험 종료 5분전입니다.",
+                end: "제 4교시 사회탐구 영역 종료령입니다. 수험생은 필기도구를 놓고 답안지는 엎어서 오른쪽에, 문제지는 표지를 덮어서 왼쪽에 놓고 조용히 기다리십시오. 감독관께서는 답안지와 문제지를 수험번호순으로 회수하여 주시고, 수량을 확인하여 주십시오."
             },
             science: {
-                prep10: "과학탐구 영역 시험 시작 10분 전입니다. 선택 과목 문제지 회차 및 인적사항을 확인해 주시기 바랍니다.",
-                prep5: "과학탐구 영역 시험 시작 5분 전입니다. 문제지를 확인해 주시기 바랍니다.",
-                start: "과학탐구 영역 시험이 시작되었습니다.",
-                remain10: "과학탐구 영역 시험 종료 10분 전입니다. 답안지 마킹 상태를 체크해 주시기 바랍니다.",
-                end: "과학탐구 영역 시험이 종료되었습니다. 수험생 여러분 수고하셨습니다."
+                prep10: "제 4교시 탐구 영역 예비령입니다. 감독관께서는 문제지와 답안지 봉투를 개봉하여 수량을 확인하여 주시고, 답안지를 책상 오른쪽에 배부해주시되, 결시자 책상 위에도 놓아주십시오. 수험생은 4교시 탐구영역 답안지인지 확인하십시오. 수험생은 답안지 뒷면에 표기된 수험생 준수사항을 읽고, 그에 따라 답안지를 작성하시기 바랍니다. 성명과 수험번호를 기입하고 답안지 작성시에는 반드시 검은색 컴퓨터용 사인펜만을 사용하십시오.",
+                prep5: "제 4교시 탐구 영역 준비령입니다. 수험생은 두 손을 책상 아래로 내린 다음 조용히 기다리며, 감독관께서는 문제지를 수험생 왼쪽에 배부해주시되, 결시자 책상 위에도 놓아주십시오. 수험생은 표지를 제외한 문제지 면수가 6면인지 확인한 다음, 문제지에 성명과 수험번호를 기입하십시오. 수험생은 문제지 표지에 제시된 필적확인문구를 답안지의 필적확인란에 정자로 기재하십시오. 수험생은 본령이 울리기 전까지 절대 문제지 표지를 미리 넘기지 않도록 주의하십시오.",
+                start: "제 4교시 과학탐구 영역 본령입니다.",
+                remainWarn: "제 4교시 중 과학탐구 영역 시험 종료 5분전입니다.",
+                end: "제 4교시 과학탐구 영역 종료령입니다. 수험생은 필기도구를 놓고 답안지는 엎어서 오른쪽에, 문제지는 표지를 덮어서 왼쪽에 놓고 조용히 기다리십시오. 감독관께서는 답안지와 문제지를 수험번호순으로 회수하여 주시고, 수량을 확인하여 주십시오."
             }
         };
 
         // Default Web Server Audio URLs
         const DEFAULT_BELL_URLS = {
-            prep10: '/audio/prep10.mp3',
-            prep5: '/audio/prep5.mp3',
-            start: '/audio/start.mp3',
-            end: '/audio/end.mp3'
+            prep10: './audio/prep10.mp3',
+            prep5: './audio/prep5.mp3',
+            start: './audio/start.mp3',
+            end: './audio/end.mp3'
         };
 
         // State Management
         let selectedSubjects = ['korean', 'math', 'english', 'history', 'social', 'science'];
-        let subjectSchedules = []; // Computed full schedules
-        let audioFiles = {}; // Listening MP3 files per subject
+        let subjectSchedules = []; 
+        let audioFiles = {}; 
         let serverBellUrls = { ...DEFAULT_BELL_URLS };
         let subjectTtsTexts = JSON.parse(JSON.stringify(DEFAULT_SUBJECT_TTS));
         let activeTtsTab = 'korean';
 
         let isRunning = false;
         let isPaused = false;
-        let currentVirtualTime = null; // Simulated JS Date object
+        let currentVirtualTime = null; 
         let timerInterval = null;
-        let activeAudio = null;
-        let triggeredEvents = new Set(); // To avoid duplicate triggers
+        let activeAudio = null; 
+        let triggeredEvents = new Set(); 
 
-        // Clock Rotation Rotations Tracking
+        // Clock Rotation Tracking
         let hourRotation = 0;
         let minuteRotation = 0;
         let secondRotation = 0;
@@ -369,8 +370,8 @@
 
         // Web Audio API Synth Bell Generator
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let activeSynthTimer = null; 
 
-        // Helper function to keep subjects in strict standard order (국수영한사과)
         function sortSubjectsByStandardOrder(subjectIds) {
             return [...subjectIds].sort((a, b) => {
                 const orderA = SUBJECT_PRESETS.find(p => p.id === a)?.order || 99;
@@ -391,7 +392,6 @@
             renderTtsSettingsTabs();
         });
 
-        // Generate 60 ticks on the analog clock face
         function generateClockTicks() {
             const container = document.getElementById('clock-ticks-container');
             if (!container) return;
@@ -414,6 +414,30 @@
         function resetDefaultServerUrls() {
             serverBellUrls = { ...DEFAULT_BELL_URLS };
             initServerUrlInputs();
+        }
+
+        // --- AUDIO & TTS GLOBAL STOP FUNCTION ---
+        function stopAllAudioAndTTS() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+
+            if (activeAudio) {
+                try {
+                    activeAudio.pause();
+                    activeAudio.currentTime = 0;
+                } catch (e) {}
+                activeAudio = null;
+            }
+
+            if (activeSynthTimer) {
+                clearTimeout(activeSynthTimer);
+                activeSynthTimer = null;
+            }
+
+            if (audioCtx && audioCtx.state === 'running') {
+                audioCtx.suspend();
+            }
         }
 
         // --- 3. UI RENDERING & BUILDERS ---
@@ -475,7 +499,7 @@
                             <span class="w-6 h-6 rounded-full bg-indigo-600/30 text-indigo-300 font-bold text-xs flex items-center justify-center border border-indigo-500/30">${index + 1}</span>
                             <div>
                                 <h4 class="font-bold text-white text-base">${sub.name}</h4>
-                                <p class="text-xs text-slate-400">${sub.hasListening ? '영어 듣기 평가 포함' : '일반 모의고사'}</p>
+                                <p class="text-xs text-slate-400">${sub.hasListening ? '영어 듣기 평가 포함' : '일반 모의고사'} · 종료 ${sub.warnOffset}분 전 안내</p>
                             </div>
                         </div>
 
@@ -553,7 +577,6 @@
         }
 
         function switchTtsTab(subId) {
-            // Save current inputs to state before switching
             saveCurrentTtsFormToState();
             activeTtsTab = subId;
             renderTtsSettingsTabs();
@@ -564,19 +587,21 @@
             const prep10El = document.getElementById('tts-prep10-input');
             const prep5El = document.getElementById('tts-prep5-input');
             const startEl = document.getElementById('tts-start-input');
-            const remain10El = document.getElementById('tts-remain10-input');
+            const remainWarnEl = document.getElementById('tts-remainWarn-input');
             const endEl = document.getElementById('tts-end-input');
 
             if (prep10El) subjectTtsTexts[activeTtsTab].prep10 = prep10El.value;
             if (prep5El) subjectTtsTexts[activeTtsTab].prep5 = prep5El.value;
             if (startEl) subjectTtsTexts[activeTtsTab].start = startEl.value;
-            if (remain10El) subjectTtsTexts[activeTtsTab].remain10 = remain10El.value;
+            if (remainWarnEl) subjectTtsTexts[activeTtsTab].remainWarn = remainWarnEl.value;
             if (endEl) subjectTtsTexts[activeTtsTab].end = endEl.value;
         }
 
         function renderTtsForm() {
             const formContainer = document.getElementById('tts-form-container');
-            const subName = SUBJECT_PRESETS.find(p => p.id === activeTtsTab)?.name || '';
+            const subPreset = SUBJECT_PRESETS.find(p => p.id === activeTtsTab);
+            const subName = subPreset?.name || '';
+            const warnOffset = subPreset?.warnOffset || 10;
             const tts = subjectTtsTexts[activeTtsTab] || DEFAULT_SUBJECT_TTS.korean;
 
             formContainer.innerHTML = `
@@ -607,10 +632,10 @@
                 </div>
                 <div>
                     <div class="flex justify-between text-slate-400 mb-1">
-                        <span>시험 종료 10분 전 안내 멘트:</span>
-                        <button onclick="testTTSInput('tts-remain10-input')" class="text-indigo-400 hover:underline">미리듣기</button>
+                        <span>시험 종료 ${warnOffset}분 전 안내 멘트:</span>
+                        <button onclick="testTTSInput('tts-remainWarn-input')" class="text-indigo-400 hover:underline">미리듣기</button>
                     </div>
-                    <input type="text" id="tts-remain10-input" value="${tts.remain10}" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    <input type="text" id="tts-remainWarn-input" value="${tts.remainWarn}" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-200 focus:outline-none focus:border-indigo-500">
                 </div>
                 <div>
                     <div class="flex justify-between text-slate-400 mb-1">
@@ -630,12 +655,14 @@
         }
 
         function testTTSInput(inputId) {
+            stopAllAudioAndTTS();
             const text = document.getElementById(inputId)?.value;
             speakTTS(text);
         }
 
         // --- 4. BELL SOUND MELODY SYNTHESIS & AUDIO PLAYER ---
         function playWestminsterBell() {
+            stopAllAudioAndTTS();
             if (audioCtx.state === 'suspended') audioCtx.resume();
             
             const notes = [
@@ -662,28 +689,32 @@
                 now += note.d;
             });
 
-            return 3000; // Estimated sound duration in ms
+            return 3000;
         }
 
         function playBellSound(type, callback) {
+            stopAllAudioAndTTS();
             const bellSoundType = document.querySelector('input[name="bell-sound-type"]:checked')?.value;
             
             if (bellSoundType === 'server') {
                 const url = document.getElementById(`bell-url-${type}`)?.value || serverBellUrls[type];
                 if (url) {
-                    const audio = new Audio(url);
-                    audio.onended = () => { if (callback) callback(); };
-                    audio.play().catch(err => {
+                    activeAudio = new Audio(url);
+                    activeAudio.onended = () => { 
+                        activeAudio = null;
+                        if (callback) callback(); 
+                    };
+                    activeAudio.play().catch(err => {
                         console.warn(`[Audio Error] Web server audio at '${url}' failed to load. Falling back to synth melody.`, err);
                         const dur = playWestminsterBell();
-                        if (callback) setTimeout(callback, dur);
+                        if (callback) activeSynthTimer = setTimeout(callback, dur);
                     });
                     return;
                 }
             }
             
             const dur = playWestminsterBell();
-            if (callback) setTimeout(callback, dur);
+            if (callback) activeSynthTimer = setTimeout(callback, dur);
         }
 
         function playTestBell(type) {
@@ -707,7 +738,7 @@
 
             const sortedSchedules = [...subjectSchedules].sort((a, b) => a.order - b.order);
 
-            sortedSchedules.forEach(sub => {
+            sortedSchedules.forEach((sub, index) => {
                 const [h, m] = sub.customStartTime.split(':').map(Number);
                 const baseDate = new Date();
                 baseDate.setHours(h, m, 0, 0);
@@ -715,11 +746,22 @@
                 const prep10 = new Date(baseDate.getTime() - 10 * 60000);
                 const prep5 = new Date(baseDate.getTime() - 5 * 60000);
                 const start = new Date(baseDate.getTime());
-                const remain10 = new Date(baseDate.getTime() + (sub.customDuration - 10) * 60000);
+                
+                // Set warning TTS offset according to subject (10 mins or 5 mins)
+                const warnMinutes = sub.warnOffset || 10;
+                const remainWarnTime = new Date(baseDate.getTime() + (sub.customDuration - warnMinutes) * 60000);
                 const end = new Date(baseDate.getTime() + sub.customDuration * 60000);
 
-                events.push({ id: `${sub.id}-prep10`, subjectId: sub.id, subject: sub.name, type: '예비령', time: prep10, action: 'prep10', order: sub.order, startTime: start, endTime: end });
-                events.push({ id: `${sub.id}-prep5`, subjectId: sub.id, subject: sub.name, type: '준비령', time: prep5, action: 'prep5', order: sub.order, startTime: start, endTime: end });
+                // 사회탐구, 과학탐구는 중간 진행 시 예비령/준비령을 제외하고,
+                // 전체 시험 일정의 맨 첫 번째 과목(index === 0)일 때만 예비령/준비령을 발송합니다.
+                const isSocialOrScience = (sub.id === 'social' || sub.id === 'science');
+                const shouldIncludePrep = !isSocialOrScience || (index === 0);
+
+                if (shouldIncludePrep) {
+                    events.push({ id: `${sub.id}-prep10`, subjectId: sub.id, subject: sub.name, type: '예비령', time: prep10, action: 'prep10', order: sub.order, startTime: start, endTime: end });
+                    events.push({ id: `${sub.id}-prep5`, subjectId: sub.id, subject: sub.name, type: '준비령', time: prep5, action: 'prep5', order: sub.order, startTime: start, endTime: end });
+                }
+
                 events.push({ id: `${sub.id}-start`, subjectId: sub.id, subject: sub.name, type: '본령 (시작)', time: start, action: 'start', order: sub.order, startTime: start, endTime: end });
 
                 if (sub.hasListening && sub.customListeningStartTime) {
@@ -746,7 +788,7 @@
                     });
                 }
 
-                events.push({ id: `${sub.id}-remain10`, subjectId: sub.id, subject: sub.name, type: '10분전 TTS', time: remain10, action: 'remain10', order: sub.order, startTime: start, endTime: end });
+                events.push({ id: `${sub.id}-remainWarn`, subjectId: sub.id, subject: sub.name, type: `${warnMinutes}분전 TTS`, time: remainWarnTime, action: 'remainWarn', order: sub.order, startTime: start, endTime: end });
                 events.push({ id: `${sub.id}-end`, subjectId: sub.id, subject: sub.name, type: '종료령', time: end, action: 'end', order: sub.order, startTime: start, endTime: end });
             });
 
@@ -754,10 +796,10 @@
         }
 
         function startExamSystem() {
+            stopAllAudioAndTTS();
             const timeline = calculateFullTimeline();
             if (timeline.length === 0) return;
 
-            // Set Virtual Time to 1분 Before First Event
             currentVirtualTime = new Date(timeline[0].time.getTime() - 60000);
             
             document.getElementById('setup-screen').classList.add('hidden');
@@ -792,18 +834,15 @@
             const minutes = date.getMinutes();
             const seconds = date.getSeconds();
 
-            // Digital Clock
             const hStr = String(hours).padStart(2, '0');
             const mStr = String(minutes).padStart(2, '0');
             const sStr = String(seconds).padStart(2, '0');
             document.getElementById('digital-clock').innerText = `${hStr}:${mStr}:${sStr}`;
 
-            // Raw Angles (0-360 deg)
             let hourDeg = (hours % 12) * 30 + minutes * 0.5;
             let minuteDeg = minutes * 6 + seconds * 0.1;
             let secondDeg = seconds * 6;
 
-            // Continuous rotation logic
             if (prevSecondDeg !== null) {
                 let diff = secondDeg - (prevSecondDeg % 360);
                 if (diff < -180) diff += 360;
@@ -840,14 +879,14 @@
         }
 
         function jumpToTimelineEvent(eventId) {
+            stopAllAudioAndTTS();
+
             const timeline = calculateFullTimeline();
             const targetEvent = timeline.find(e => e.id === eventId);
             if (!targetEvent) return;
 
-            // Jump to 2 seconds BEFORE event
             currentVirtualTime = new Date(targetEvent.time.getTime() - 2000);
             
-            // Clean future triggered events
             triggeredEvents.forEach(id => {
                 const ev = timeline.find(e => e.id === id);
                 if (ev && ev.time >= currentVirtualTime) {
@@ -855,17 +894,13 @@
                 }
             });
 
-            if (activeAudio) {
-                activeAudio.pause();
-                activeAudio = null;
-            }
-
             updateClocks(currentVirtualTime);
             checkTimelineEvents(currentVirtualTime);
             renderTimelineUI(timeline);
         }
 
         function skipToNextEvent() {
+            stopAllAudioAndTTS();
             const timeline = calculateFullTimeline();
             const upcoming = timeline.find(e => e.time > currentVirtualTime);
             if (upcoming) {
@@ -887,7 +922,6 @@
                 }
             });
 
-            // Highlight next upcoming bell
             const upcoming = timeline.find(e => e.time > now);
             if (upcoming) {
                 document.getElementById('next-bell-text').innerText = `다음 알림: [${upcoming.subject}] ${upcoming.type} (${formatTimeStr(upcoming.time)})`;
@@ -895,7 +929,6 @@
                 document.getElementById('next-bell-text').innerText = `모든 시험 방송 종료`;
             }
 
-            // Update Active Subject Badge
             updateCurrentSubjectBadge(now);
         }
 
@@ -956,21 +989,18 @@
                 });
             } else if (event.action === 'listening') {
                 if (event.hasListening && audioFiles[event.subId]) {
-                    if (activeAudio) activeAudio.pause();
+                    stopAllAudioAndTTS();
                     const url = URL.createObjectURL(audioFiles[event.subId]);
                     activeAudio = new Audio(url);
                     activeAudio.play();
                 }
-            } else if (event.action === 'remain10') {
-                speakTTS(ttsForSubject.remain10);
+            } else if (event.action === 'remainWarn') {
+                stopAllAudioAndTTS();
+                speakTTS(ttsForSubject.remainWarn);
             } else if (event.action === 'end') {
                 playBellSound('end', () => {
                     speakTTS(ttsForSubject.end);
                 });
-                if (activeAudio) {
-                    activeAudio.pause();
-                    activeAudio = null;
-                }
             }
 
             renderTimelineUI(calculateFullTimeline());
@@ -1038,36 +1068,37 @@
                 document.getElementById('pause-icon').setAttribute('data-lucide', isPaused ? 'play' : 'pause');
                 lucide.createIcons();
 
-                if (activeAudio) {
-                    if (isPaused) activeAudio.pause();
-                    else activeAudio.play();
+                if (isPaused) {
+                    stopAllAudioAndTTS();
                 }
             });
 
             // Fast Rewind (-30 Seconds)
             document.getElementById('rewind-30-btn').addEventListener('click', () => {
                 if (currentVirtualTime) {
+                    stopAllAudioAndTTS();
                     currentVirtualTime = new Date(currentVirtualTime.getTime() - 30000);
                     updateClocks(currentVirtualTime);
-                    if (activeAudio) activeAudio.currentTime = Math.max(0, activeAudio.currentTime - 30);
+                    checkTimelineEvents(currentVirtualTime);
                 }
             });
 
             // Fast Forward (+30 Seconds)
             document.getElementById('forward-30-btn').addEventListener('click', () => {
                 if (currentVirtualTime) {
+                    stopAllAudioAndTTS();
                     currentVirtualTime = new Date(currentVirtualTime.getTime() + 30000);
                     updateClocks(currentVirtualTime);
-                    if (activeAudio) activeAudio.currentTime += 30;
+                    checkTimelineEvents(currentVirtualTime);
                 }
             });
 
             // Exit System
             document.getElementById('exit-btn').addEventListener('click', () => {
                 if (confirm('모의고사 방송을 종료하고 초기 화면으로 돌아가시겠습니까?')) {
+                    stopAllAudioAndTTS();
                     isRunning = false;
                     clearInterval(timerInterval);
-                    if (activeAudio) activeAudio.pause();
                     document.getElementById('exam-screen').classList.add('hidden');
                     document.getElementById('exam-screen').classList.remove('flex');
                     document.getElementById('exit-btn').classList.add('hidden');
@@ -1078,4 +1109,3 @@
     </script>
 </body>
 </html>
-
